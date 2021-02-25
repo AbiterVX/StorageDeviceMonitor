@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>存储设备监控</title>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="../JQuery/jquery-3.3.1.min.js"></script>
 </head>
+
 <style type="text/css">
     .btnStyle{
         margin-bottom: 10px;
@@ -19,25 +20,22 @@
         background-color: white;
     }
 </style>
-
 <script >
-    function f_2() {
-        var command = "dstat 1 0";
-        var data='{"command":"'+ command +'"}';
+    function f_getHostInfo() {
         $.ajax({
             type:"post",
             dataType:"json",
-            url:"/Command",
-            data:data,
+            url:"/getMessage",
             processData :false,
             contentType:"application/json",
             async:false,
-            success:function (jsondata) {
-                alert(jsondata["result"]);
-                //alert(max_page_index);
+            success:function (jsonData) {
+                alert(jsonData["result"]);
+
+
+
             },
             error: function (err) {
-                //alert("getThemePostMaxPageIndex Wrong!");
             }
         });
     }
@@ -49,7 +47,7 @@
     <hr style="margin-bottom: 20px;"/>
 
     <div>
-        <button class ="btnStyle" onclick="f_2()">测试</button>
+        <button class ="btnStyle" onclick="f_getHostInfo()">测试</button>
     </div>
 
 </body>

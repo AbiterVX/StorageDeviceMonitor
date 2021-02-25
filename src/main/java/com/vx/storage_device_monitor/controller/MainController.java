@@ -33,18 +33,24 @@ public class MainController {
     @ResponseBody
     @RequestMapping(value = "/Command", method = RequestMethod.POST)
     public Map<String, String> post_RunCommand(@RequestBody Map<String, String> map){
-        //配置信息
-        HostConfigInfo hostConfigInfo =new HostConfigInfo("39.105.123.116","root","576412173");
         //指令
         String command=map.get("command");
+        System.out.println(command);
         //返回结果
         Map<String, String> resultMap=new HashMap<>();
-        //执行指令
-        //hostMonitor.getStorageDeviceInfoList();
 
-        List<String> result = hostMonitor.runCommand(command, hostConfigInfo);
+        resultMap.put("result","!!!");
+        return resultMap;
+    }
 
-        //resultMap.put("result",result.toString());
+    @ResponseBody
+    @RequestMapping(value = "/getMessage", method = RequestMethod.POST)
+    public Map<String, String> post_getMessage(){
+        System.out.println("sss");
+        //返回结果
+        Map<String, String> resultMap=new HashMap<>();
+
+        //hostMonitor
         return resultMap;
     }
 }

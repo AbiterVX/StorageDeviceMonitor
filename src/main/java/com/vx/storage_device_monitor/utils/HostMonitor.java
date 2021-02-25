@@ -15,9 +15,9 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /**
- * 主机监控
+ * 主机监控 -main class
  */
-public class HostMonitor {
+public class HostMonitor implements Runnable {
     //---------成员
     //字符集
     private String chartset;
@@ -29,11 +29,18 @@ public class HostMonitor {
     List<HostConfigInfo> hostConfigInfoList;
     //Host系统信息
     List<HostInfo> hostInfoList;
+    //采样间隔，默认为2s
+    public int interval_ms;
+    //线程
+    private Thread newThread;
+    //线程开始
+    public boolean threadStart;
 
-
-    //---------函数
-    //Init
+    //---------Init
     public HostMonitor(){
+        this(2000);
+    }
+    public HostMonitor(int _interval_ms){
         connectionMap =new HashMap<>();
         chartset = "UTF-8";
         configInfo = new Config();
@@ -43,9 +50,11 @@ public class HostMonitor {
             HostInfo newHostInfo = new HostInfo(hostConfigInfoList.get(i).ip);
             hostInfoList.add(newHostInfo);
         }
-        //Init记录字段
-
+        interval_ms = _interval_ms;
+        threadStart = false;
     }
+
+    //---------SSH远程连接&指令调用
     //获取Session
     public Session getSession(HostConfigInfo hostConfigInfo){
         boolean sessionExist = connectionMap.containsKey(hostConfigInfo.ip);
@@ -118,6 +127,15 @@ public class HostMonitor {
             System.out.println("NULL");
         }
         return result;
+    }
+
+    //--------- 采样
+    //全部采样
+    public void sampleAll(){
+        sampleNetBindWidth();
+        sampleCpuUsage();
+        sampleMemory();
+        sampleDisk();
     }
 
     //[网络带宽]采样
@@ -197,26 +215,20 @@ public class HostMonitor {
 
     }
 
-    //main
-    public static void main(String[] args) {
-        HostMonitor hostMonitor = new HostMonitor();
-
-        boolean isRun = true;
-        int interval_ms = 2000;
-        //isRun = false;
-        while(isRun){
-            hostMonitor.sampleNetBindWidth();
-            hostMonitor.sampleCpuUsage();
-            hostMonitor.sampleMemory();
-            hostMonitor.sampleDisk();
-            for(HostInfo hostInfo:hostMonitor.hostInfoList){
-                hostInfo.printNetBindWidth();
-                hostInfo.printCpuUsage();
-                hostInfo.printMemoryUsage();
-                hostInfo.printDiskUsage(interval_ms);
-                System.out.println(" ");
+    //---------
+    //多线程运行
+    @Override
+    public void run() {
+        while(threadStart){
+            //采样
+            sampleAll();
+            //获取
+            /*
+            for(HostInfo hostInfo:hostInfoList){
+                System.out.println(hostInfo.getOutputData(interval_ms).toString());
             }
-
+            */
+            //等待
             try {
                 Thread.sleep(interval_ms);
             }
@@ -224,5 +236,45 @@ public class HostMonitor {
                 e.printStackTrace();
             }
         }
+
     }
+    //开始线程
+    public void start(){
+        if(newThread == null){
+            for(HostInfo hostInfo:hostInfoList){
+                hostInfo.initValue();
+            }
+            threadStart = true;
+            newThread = new Thread(this,"HostMonitor—thread");
+            newThread.start();
+        }
+    }
+    //终止线程
+    public void stop(){
+        threadStart = false;
+        try {
+            Thread.sleep(interval_ms*2);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(newThread != null){
+            newThread.interrupt();
+            newThread = null;
+        }
+    }
+    //main-用于测试
+    public static void main(String[] args) {
+        HostMonitor hostMonitor = new HostMonitor();
+        hostMonitor.start();
+
+        try {
+            Thread.sleep(10000);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        hostMonitor.stop();
+    }
+
 }

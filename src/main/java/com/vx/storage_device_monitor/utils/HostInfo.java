@@ -1,28 +1,35 @@
 package com.vx.storage_device_monitor.utils;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * No Use now
+ * Host各个数值相关信息
  */
 public class HostInfo {
     public HostInfo(String _ip){
         ip = _ip;
         receiveBytes = new int[2];
-        Arrays.fill(receiveBytes,0);
         transmitBytes = new int[2];
-        Arrays.fill(transmitBytes,0);
-
         cpuTotalTime = new int[2];
-        Arrays.fill(cpuTotalTime,0);
         cpuIdleTime = new int[2];
-        Arrays.fill(cpuIdleTime,0);
+        ioTimeSpent = new int[2];
+        initValue();
+    }
 
+    public void initValue(){
+        Arrays.fill(receiveBytes,0);
+        Arrays.fill(transmitBytes,0);
+        Arrays.fill(cpuTotalTime,0);
+        Arrays.fill(cpuIdleTime,0);
         memTotal = 0;
         memAvaliable = 0;
-
-        ioTimeSpent = new int[2];
         Arrays.fill(ioTimeSpent,0);
     }
     //ip
@@ -58,43 +65,67 @@ public class HostInfo {
     //能耗
     //磁盘故障信息
 
-    //[网络带宽]输出（格式KB/s）
-    public void printNetBindWidth(){
-        float reciveBW = 0;
+    //[网络]带宽（格式KB/s）
+    public float[] getNetBindWidth(){
+        float receiveBW = 0;
         float transmitBW = 0;
         if(receiveBytes[0] != 0 && receiveBytes[0] != transmitBytes[1]){
             //两次采样差值，并由原bytes转为KB/s格式
-            reciveBW = (receiveBytes[1] - receiveBytes[0])*8f/60f/1024f ;
+            receiveBW = (receiveBytes[1] - receiveBytes[0])*8f/60f/1024f ;
             transmitBW = (transmitBytes[1] - transmitBytes[0])*8f/60f/1024f;
             //保留2位小数
-            reciveBW=( float )(Math.round(reciveBW* 100f ) / 100f );
+            receiveBW=( float )(Math.round(receiveBW* 100f ) / 100f );
             transmitBW=( float )(Math.round(transmitBW* 100f )/ 100f );
         }
-        System.out.println("IP: "+ip+" ,reciveBW: "+reciveBW + "KB/s ,transmitBW: "+transmitBW +" KB/s");
+        float[] result = new float[2];
+        result[0] = receiveBW;
+        result[1] = transmitBW;
+        //System.out.println("IP: "+ip+" ,receiveBW: "+receiveBW + "KB/s ,transmitBW: "+transmitBW +" KB/s");
+        return result;
     }
-
-    public void printCpuUsage(){
+    //[CPU]利用率
+    public float getCpuUsage(){
         float cpuUsage = 0;
         if(cpuTotalTime[0] != 0 && cpuTotalTime[0] != cpuTotalTime[1]){
             cpuUsage = (1f-  (float) (cpuIdleTime[1] -cpuIdleTime[0]) / (float)(cpuTotalTime[1] - cpuTotalTime[0]) ) * 100f ;
             cpuUsage=( float )(Math.round(cpuUsage* 100f ) / 100f );
         }
-        System.out.println("IP: "+ip+" ,cpuUsage: "+cpuUsage + " %");
+        //System.out.println("IP: "+ip+" ,cpuUsage: "+cpuUsage + " %");
+        return cpuUsage;
     }
-
-    public void printMemoryUsage(){
+    //[内存]利用率
+    public float getMemoryUsage(){
         float memoryUsage = 0;
         memoryUsage = (float) (memTotal - memAvaliable ) / (float)memTotal * 100f ;
         memoryUsage = ( float )(Math.round(memoryUsage* 100f ) / 100f );
-        System.out.println("IP: "+ip+" ,memoryUsage: "+memoryUsage + " %");
+        //System.out.println("IP: "+ip+" ,memoryUsage: "+memoryUsage + " %");
+        return memoryUsage;
     }
-
-    public void printDiskUsage(int interval_ms){
+    //[磁盘]利用率
+    public float getDiskUsage(int interval_ms){
         float diskUsage = 0;
         if(ioTimeSpent[0] != 0 && ioTimeSpent[0] != ioTimeSpent[1]){
             diskUsage = (float) (ioTimeSpent[1] - ioTimeSpent[0]) / (float)interval_ms * 100f;
             diskUsage=( float )(Math.round(diskUsage* 100f ) / 100f );
         }
-        System.out.println("IP: "+ip+" ,diskUsage: "+diskUsage + " %");
+        //System.out.println("IP: "+ip+" ,diskUsage: "+diskUsage + " %");
+        return diskUsage;
+    }
+
+    //得出用于前端显示的数据
+    public Map<String, String> getOutputData(int interval_ms){
+        Map<String, String> resultMap=new HashMap<>();
+        float[] netBindWidth = getNetBindWidth();
+        float cpuUsage = getCpuUsage();
+        float memoryUsage = getMemoryUsage();
+        float diskUsage = getDiskUsage(interval_ms);
+
+        resultMap.put("receiveBW",String.valueOf(netBindWidth[0]));
+        resultMap.put("transmitBW",String.valueOf(netBindWidth[0]));
+        resultMap.put("cpuUsage",String.valueOf(cpuUsage));
+        resultMap.put("memoryUsage",String.valueOf(memoryUsage));
+        resultMap.put("diskUsage",String.valueOf(diskUsage));
+
+        return resultMap;
     }
 }
