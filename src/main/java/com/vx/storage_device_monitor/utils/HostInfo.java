@@ -115,11 +115,12 @@ public class HostInfo {
         float memoryUsage = getMemoryUsage();
         float diskUsage = getDiskUsage(interval_ms);
 
-        resultMap.put("receiveBW",String.valueOf(netBindWidth[0]));
-        resultMap.put("transmitBW",String.valueOf(netBindWidth[0]));
-        resultMap.put("cpuUsage",String.valueOf(cpuUsage));
-        resultMap.put("memoryUsage",String.valueOf(memoryUsage));
-        resultMap.put("diskUsage",String.valueOf(diskUsage));
+        resultMap.put("ip",ip);
+        resultMap.put("receiveBW",netBindWidth[0]);
+        resultMap.put("transmitBW",netBindWidth[0]);
+        resultMap.put("cpuUsage",cpuUsage);
+        resultMap.put("memoryUsage",memoryUsage);
+        resultMap.put("diskUsage",diskUsage);
 
         return resultMap;
     }

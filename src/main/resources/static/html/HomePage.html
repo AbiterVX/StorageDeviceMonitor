@@ -21,7 +21,7 @@
     }
 </style>
 <script >
-    function f_getHostInfo() {
+    function FGetHostInfoList() {
         $.ajax({
             type:"post",
             dataType:"json",
@@ -42,9 +42,9 @@
 <body>
     <div style="margin-top: 20px;font-size: 30px;">存储设备监控</div>
     <hr style="margin-bottom: 20px;"/>
-
+    
     <div>
-        <button class ="btnStyle" onclick="f_getHostInfo()">测试</button>
+        <button class ="btnStyle" onclick="FGetHostInfoList()">获取主机信息</button>
     </div>
 
 </body>

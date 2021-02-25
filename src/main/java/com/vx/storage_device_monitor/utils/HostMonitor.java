@@ -228,6 +228,14 @@ public class HostMonitor implements Runnable {
         return jsonArray.toJSONString();
     }
 
+    public String getHostIpList(){
+        JSONArray jsonArray = new JSONArray();
+        for(HostInfo hostInfo:hostInfoList){
+            jsonArray.add(hostInfo.ip);
+        }
+        return jsonArray.toJSONString();
+    }
+
     //---------多线程执行
     //多线程运行
     @Override

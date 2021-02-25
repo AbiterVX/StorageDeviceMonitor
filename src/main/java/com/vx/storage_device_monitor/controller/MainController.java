@@ -38,9 +38,21 @@ public class MainController {
     //主机数据获取
     @ResponseBody
     @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)
-    public String post_getMessage(){
+    public String postGetHostInfoList(){
         String result = hostMonitor.getHostInfoListOutputData();
+        System.out.println(result);
+        System.out.println(hostMonitor.getHostIpList());
+        return result;
+    }
+
+    //主机IP获取
+    @ResponseBody
+    @RequestMapping(value = "/getHostIpList", method = RequestMethod.POST)
+    public String postGetHostIpList(){
+        String result = hostMonitor.getHostIpList();
         System.out.println(result);
         return result;
     }
+
+
 }
