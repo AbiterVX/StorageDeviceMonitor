@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>存储设备监控</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<style type="text/css">
+    .btnStyle{
+        margin-bottom: 10px;
+        border-radius:5px;
+        width:300px;
+        height:60px;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left:30px;
+    }
+    .btnStyle:hover{
+        background-color: white;
+    }
+</style>
+
+<script >
+    function f_2() {
+        var command = "dstat 1 0";
+        var data='{"command":"'+ command +'"}';
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/Command",
+            data:data,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (jsondata) {
+                alert(jsondata["result"]);
+                //alert(max_page_index);
+            },
+            error: function (err) {
+                //alert("getThemePostMaxPageIndex Wrong!");
+            }
+        });
+    }
+
+</script>
+
+<body>
+    <div style="margin-top: 20px;font-size: 30px;">存储设备监控</div>
+    <hr style="margin-bottom: 20px;"/>
+
+    <div>
+        <button class ="btnStyle" onclick="f_2()">测试</button>
+    </div>
+
+</body>
+</html>
