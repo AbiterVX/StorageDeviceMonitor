@@ -3,11 +3,13 @@ package com.vx.storage_device_monitor.utils;
 
 
 
-
+import com.alibaba.fastjson.JSON;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -215,7 +217,18 @@ public class HostMonitor implements Runnable {
 
     }
 
-    //---------
+    //---------获得Host设备信息
+    public String getHostInfoListOutputData(){
+        JSONArray jsonArray = new JSONArray();
+        for(HostInfo hostInfo:hostInfoList){
+            Map<String, Object> result = hostInfo.getOutputData(interval_ms);
+            JSONObject jsonObject = new JSONObject(result);
+            jsonArray.add(jsonObject);
+        }
+        return jsonArray.toJSONString();
+    }
+
+    //---------多线程执行
     //多线程运行
     @Override
     public void run() {

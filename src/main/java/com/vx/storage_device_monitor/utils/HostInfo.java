@@ -1,12 +1,7 @@
 package com.vx.storage_device_monitor.utils;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
-
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -113,8 +108,8 @@ public class HostInfo {
     }
 
     //得出用于前端显示的数据
-    public Map<String, String> getOutputData(int interval_ms){
-        Map<String, String> resultMap=new HashMap<>();
+    public Map<String, Object> getOutputData(int interval_ms){
+        Map<String, Object> resultMap=new HashMap<>();
         float[] netBindWidth = getNetBindWidth();
         float cpuUsage = getCpuUsage();
         float memoryUsage = getMemoryUsage();

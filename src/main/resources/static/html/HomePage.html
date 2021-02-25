@@ -25,15 +25,12 @@
         $.ajax({
             type:"post",
             dataType:"json",
-            url:"/getMessage",
+            url:"/getHostInfoList",
             processData :false,
             contentType:"application/json",
             async:false,
             success:function (jsonData) {
-                alert(jsonData["result"]);
-
-
-
+                alert(jsonData[0]["cpuUsage"]);
             },
             error: function (err) {
             }

@@ -15,42 +15,32 @@ import java.util.List;
 
 @Controller
 public class MainController {
+    //主机监控类
     private HostMonitor hostMonitor;
     public MainController(){
-        hostMonitor = new HostMonitor();
+        hostMonitor = new HostMonitor(2000);
+        //后台开启线程：用于数据采样
+        hostMonitor.start();
     }
 
+    //index界面/主界面
     @RequestMapping(value ="/", method = RequestMethod.GET)
     public String get_HomePage(){
         return "html/HomePage.html";
     }
 
+    //测试界面
     @RequestMapping(value ="Test", method = RequestMethod.GET)
     public String Test(){
         return "html/Test.html";
     }
 
+    //主机数据获取
     @ResponseBody
-    @RequestMapping(value = "/Command", method = RequestMethod.POST)
-    public Map<String, String> post_RunCommand(@RequestBody Map<String, String> map){
-        //指令
-        String command=map.get("command");
-        System.out.println(command);
-        //返回结果
-        Map<String, String> resultMap=new HashMap<>();
-
-        resultMap.put("result","!!!");
-        return resultMap;
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/getMessage", method = RequestMethod.POST)
-    public Map<String, String> post_getMessage(){
-        System.out.println("sss");
-        //返回结果
-        Map<String, String> resultMap=new HashMap<>();
-
-        //hostMonitor
-        return resultMap;
+    @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)
+    public String post_getMessage(){
+        String result = hostMonitor.getHostInfoListOutputData();
+        System.out.println(result);
+        return result;
     }
 }
