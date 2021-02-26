@@ -41,7 +41,6 @@ public class MainController {
     public String postGetHostInfoList(){
         String result = hostMonitor.getHostInfoListOutputData();
         System.out.println(result);
-        System.out.println(hostMonitor.getHostIpList());
         return result;
     }
 

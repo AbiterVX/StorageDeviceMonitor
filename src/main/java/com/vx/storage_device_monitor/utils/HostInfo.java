@@ -1,6 +1,8 @@
 package com.vx.storage_device_monitor.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +117,14 @@ public class HostInfo {
         float memoryUsage = getMemoryUsage();
         float diskUsage = getDiskUsage(interval_ms);
 
+
+        SimpleDateFormat sdf = new SimpleDateFormat();// 格式化时间
+        sdf.applyPattern("yyyy/MM/dd HH:mm:ss");// a为am/pm的标记
+        // 获取当前时间
+        ;
+        //System.out.println(date.toString());
+
+        resultMap.put("date",System.currentTimeMillis());
         resultMap.put("ip",ip);
         resultMap.put("receiveBW",netBindWidth[0]);
         resultMap.put("transmitBW",netBindWidth[0]);
