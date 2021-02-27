@@ -127,7 +127,7 @@ public class HostInfo {
         resultMap.put("date",System.currentTimeMillis());
         resultMap.put("ip",ip);
         resultMap.put("receiveBW",netBindWidth[0]);
-        resultMap.put("transmitBW",netBindWidth[0]);
+        resultMap.put("transmitBW",netBindWidth[1]);
         resultMap.put("cpuUsage",cpuUsage);
         resultMap.put("memoryUsage",memoryUsage);
         resultMap.put("diskUsage",diskUsage);

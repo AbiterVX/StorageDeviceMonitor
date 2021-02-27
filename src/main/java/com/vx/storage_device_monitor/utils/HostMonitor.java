@@ -10,6 +10,10 @@ import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,10 +25,8 @@ import java.util.*;
  */
 public class HostMonitor implements Runnable {
     //---------成员
-    //字符集
-    private String chartset;
-    //ssh连接 List
-    private Map<String,Connection> connectionMap;
+    SSHManager sshManager;
+
     //Config配置信息
     private Config configInfo;
     //Host配置信息
@@ -40,97 +42,33 @@ public class HostMonitor implements Runnable {
 
     //---------Init
     public HostMonitor(){
+        //延迟时间默认为2000，单位：ms
         this(2000);
     }
     public HostMonitor(int _interval_ms){
-        connectionMap =new HashMap<>();
-        chartset = "UTF-8";
+        //配置信息
         configInfo = new Config();
+        //主机配置信息
         hostConfigInfoList = configInfo.getStorageDeviceHost();
+        //主机返回信息
         hostInfoList =new ArrayList<>();
         for(int i=0;i<hostConfigInfoList.size();i++){
             HostInfo newHostInfo = new HostInfo(hostConfigInfoList.get(i).ip);
             hostInfoList.add(newHostInfo);
         }
+        //延迟时间 单位：ms
         interval_ms = _interval_ms;
+        //采样线程开关
         threadStart = false;
+        //SSH默认连接方式为JSCH。
+        sshManager = new JschSSHManager();
     }
 
     //---------SSH远程连接&指令调用
-    //获取Session
-    public Session getSession(HostConfigInfo hostConfigInfo){
-        boolean sessionExist = connectionMap.containsKey(hostConfigInfo.ip);
-        Connection newConnection = null;
-        Session newSession = null;
-
-        try {
-            if(sessionExist){
-                newConnection = connectionMap.get(hostConfigInfo.ip);
-                newSession = newConnection.openSession();
-            }
-            else{
-                newConnection = new Connection(hostConfigInfo.ip);
-                newConnection.connect();
-                boolean isAuthenticated = newConnection.authenticateWithPassword(hostConfigInfo.username, hostConfigInfo.password);
-                if(isAuthenticated){
-                    newSession = newConnection.openSession();
-                    connectionMap.put(hostConfigInfo.ip,newConnection);
-                }
-                else{
-                    //连接失败
-                    return null;
-                }
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            if (newSession != null) {
-                newSession.close();
-            }
-            if (newConnection != null) {
-                newConnection.close();
-            }
-            if(connectionMap.containsKey(hostConfigInfo.ip)){
-                connectionMap.remove(hostConfigInfo.ip);
-            }
-        }
-        return newSession;
-    }
     //执行指令
     public List<String> runCommand(String command, HostConfigInfo hostConfigInfo){
-        List<String> result = new ArrayList<String>();
-
-        //远程调用
-        Session session = getSession(hostConfigInfo);
-        if(session != null){
-            try {
-                //执行指令
-                session.execCommand(command);
-                //输出
-                InputStream is = new StreamGobbler(session.getStdout());
-                BufferedReader brs = new BufferedReader(new InputStreamReader(is, chartset));
-                //逐行获取输出结果
-                for (String line = brs.readLine(); line != null; line = brs.readLine()) {
-                    result.add(line);
-                }
-                //session.waitForCondition(ChannelCondition.CLOSED | ChannelCondition.EOF | ChannelCondition.EXIT_STATUS, 1000 * 3600);
-                //System.out.println("ExitCode: " + session.getExitStatus()); //得到脚本运行成功与否的标志 ：0 成功,非0 失败
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                if (session != null) {
-                    session.close();
-                }
-            }
-        }
-        else{
-            System.out.println("NULL");
-        }
-        return result;
+        return sshManager.runCommand(command,hostConfigInfo);
     }
-
     //--------- 采样
     //全部采样
     public void sampleAll(){
@@ -139,7 +77,6 @@ public class HostMonitor implements Runnable {
         sampleMemory();
         sampleDisk();
     }
-
     //[网络带宽]采样
     public void sampleNetBindWidth(){
         String command = "cat /proc/net/dev";
@@ -216,7 +153,6 @@ public class HostMonitor implements Runnable {
         }
 
     }
-
     //---------获得Host设备信息
     public String getHostInfoListOutputData(){
         JSONArray jsonArray = new JSONArray();
@@ -227,7 +163,7 @@ public class HostMonitor implements Runnable {
         }
         return jsonArray.toJSONString();
     }
-
+    //获取Host的IP
     public String getHostIpList(){
         JSONArray jsonArray = new JSONArray();
         for(HostInfo hostInfo:hostInfoList){
@@ -235,7 +171,6 @@ public class HostMonitor implements Runnable {
         }
         return jsonArray.toJSONString();
     }
-
     //---------多线程执行
     //多线程运行
     @Override

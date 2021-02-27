@@ -18,11 +18,16 @@
     -->
 </head>
 
+<script>
 
+</script>
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">存储设备监控</a>
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
+            存储设备监控
+        </a>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -70,12 +75,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                                Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                                 Customers
                             </a>
@@ -86,45 +85,18 @@
                                 Reports
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                                Integrations
-                            </a>
-                        </li>
                     </ul>
 
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Saved reports</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                        </a>
+                        <span>存储设备</span>
                     </h6>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
+                    <ul class="nav flex-column mb-2" id = "HostIpList" >
+                        <!--<li class="nav-item">
                             <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                Current month
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                                39.105.123.116
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                Last quarter
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                Social engagement
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                                Year-end sale
-                            </a>
-                        </li>
+                        </li>-->
                     </ul>
                 </div>
             </nav>
@@ -133,32 +105,19 @@
                 <div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
                     <div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
                         <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0">
-
                         </div>
                     </div>
                     <div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
                         <div style="position:absolute;width:200%;height:200%;left:0; top:0">
-
                         </div>
                     </div>
                 </div>
 
 
-                <h2>设备IP列表</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th>IP</th>
-                            </tr>
-                        </thead>
-                        <tbody id ="HostIpListTable">
-                        </tbody>
-                    </table>
-                </div>
+                <!-- -->
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h1 class="h2">CPU利用率</h1>
+                    <h2 class="h2">存储设备资源使用状况</h2>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group mr-2">
                             <button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -168,10 +127,31 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             This week
                         </button>
+
                     </div>
                 </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>CPU利用率</th>
+                                <th>内存利用率</th>
+                                <th>磁盘利用率</th>
+                                <th>网络接受数据</th>
+                                <th>网络发送数据</th>
+                            </tr>
+                        </thead>
+                        <tbody id ="HostIpListTable">
+                        </tbody>
+                    </table>
+                </div>
 
-
+                <!-- CPU利用率标题-->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h2">CPU利用率</h2>
+                </div>
+                <!-- CPU利用率图表-->
                 <div id="CpuUsageChart" style="width: 100%;height: 420px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;" >
                     <div style="position: relative; cursor: default; ">
                         <canvas data-zr-dom-id="zr_0"  style=" position: absolute;  user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
@@ -179,9 +159,11 @@
                     </div>
                 </div>
 
+                <!-- 内存利用率图表-->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h1 class="h2">内存利用率</h1>
+                    <h2 class="h2">内存利用率</h2>
                 </div>
+                <!-- 内存利用率标题-->
                 <div id="MemoryUsageChart" style="width: 100%;height: 420px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
                     <div style=";position: relative; cursor: default; ">
                         <canvas data-zr-dom-id="zr_0"  style=" position: absolute; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
@@ -198,6 +180,9 @@
 </body>
 
 <script >
+
+
+
     //更新间隔
     var refreshInterval = 1000 * 5;
     //更新Host信息定时任务
@@ -215,16 +200,17 @@
     var memoryUsageChart;
 
     //[磁盘]利用率
-
+    var diskUsage
     //[网络带宽]receiveBW  KB/S
 
     //[网络带宽]transmitBW KB/S
 
+    var HostIpListTable = document.getElementById("HostIpListTable");
 
     //页面加载完成后执行
     window.onload=function (){
+        //设置IP
         FGetHostIpList();
-
         //初始化CPU利用率表格
         cpuUsageChart = echarts.init(document.getElementById("CpuUsageChart"));
         FInitTable("CPU利用率","利用率",true,cpuUsageChart,CpuUsageData);
@@ -237,9 +223,15 @@
         refreshHostInfoList = window.setInterval (FGetHostInfoList,refreshInterval);
         //取消定时任务
         //window.clearInterval(FGetHostIpList);
+
+
+
     }
 
-    //获取主机IP
+    function FGetHostInfo(currentHostIp){
+        alert(currentHostIp)
+    }
+    //主机IP
     function FGetHostIpList(){
         $.ajax({
             type:"post",
@@ -249,14 +241,19 @@
             contentType:"application/json",
             async:false,
             success:function (jsonData) {
-                var HostIpListTable=document.getElementById("HostIpListTable");
+                var hostIpList = document.getElementById("HostIpList");
                 var HostIpListHtml = ""
                 for(var i=0;i< jsonData.length;i++){
-                    HostIpListHtml +=   '<tr>' +
-                        '  <td>'+jsonData[i]  +'</td>' +
-                        '</tr>';
+                    HostIpListHtml +=
+                        '<li class="nav-item">' +
+                        '   <a class="nav-link" href="#" onclick="FGetHostInfo('+ i +')">' +
+                        '       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>' +
+                            jsonData[i] +
+                        '   </a>' +
+                        '</li>'
+
                 }
-                HostIpListTable.innerHTML = HostIpListHtml;
+                hostIpList.innerHTML = HostIpListHtml;
             },
             error: function (err) {
             }
@@ -264,6 +261,7 @@
 
 
     }
+
     //[定时更新]获取主机信息
     function FGetHostInfoList() {
         $.ajax({
@@ -274,40 +272,37 @@
             contentType:"application/json",
             async:false,
             success:function (jsonData) {
-                //-----CPU利用率表格
-                //插入信息数据
-                var date = new Date(jsonData[0]["date"]);
 
+                //时间转换
+                var date = new Date(jsonData[0]["date"]);
                 var y = date.getFullYear();
                 var m = date.getMonth() + 1;
                 var d = date.getDate();
                 var h = date.getHours();
                 var min = date.getMinutes();
                 var s = date.getSeconds();
-                //var ms = date.getMilliseconds()
                 var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
-
+                //dateString = date.format("yyyy/MM/dd hh:mm:ss");
+                //alert(dateString);
+                //插入信息数据与更新表格
                 FAddData(cpuUsageChart,CpuUsageData,jsonData[0]["ip"],[ dateString, jsonData[0]["cpuUsage"] ]);
                 FAddData(memoryUsageChart,memoryUsageData,jsonData[0]["ip"],[ dateString, jsonData[0]["memoryUsage"] ]);
 
 
+                //更新
 
-                /*
-                CpuUsageData.push({
-                    name: jsonData[0]["ip"],
-                    value:[ dateString,
-                            jsonData[0]["cpuUsage"] ]
-
-                });
-                //CpuUsageData.shift();
-                //更新表格信息
-                cpuUsageChart.setOption({
-                    series: [{
-                        data: CpuUsageData
-                    }]
-                });*/
-
-
+                var HostIpListHtml = ""
+                for(var i=0;i< jsonData.length;i++){
+                    HostIpListHtml +=   '<tr>' +
+                        '  <td>'+jsonData[i]["ip"]  +'</td>' +
+                        '  <td>'+jsonData[i]["cpuUsage"]  +' %</td>' +
+                        '  <td>'+jsonData[i]["memoryUsage"]  +' %</td>' +
+                        '  <td>'+jsonData[i]["diskUsage"]  +' %</td>' +
+                        '  <td>'+jsonData[i]["receiveBW"]  +' Kb/s</td>' +
+                        '  <td>'+jsonData[i]["transmitBW"]  +'Kb/s</td>' +
+                        '</tr>';
+                }
+                HostIpListTable.innerHTML = HostIpListHtml;
 
             },
             error: function (err) {
@@ -387,7 +382,9 @@
     }
     //向表格添加信息
     function FAddData(currentChart,currentData,newDataName,newDataValue){
-        //CpuUsageData.shift();
+        if(currentData.length > 1000){
+            currentData.shift();
+        }
         currentData.push({
             name: newDataName,
             value:newDataValue

@@ -50,13 +50,13 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
-        <!--
+
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.54</version>
         </dependency>
-            -->
+
     </dependencies>
 
     <build>
@@ -64,6 +64,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.vx.storage_device_monitor.StorageDeviceMonitorApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
