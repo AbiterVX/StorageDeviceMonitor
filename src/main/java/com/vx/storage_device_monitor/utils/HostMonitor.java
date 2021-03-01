@@ -177,6 +177,26 @@ public class HostMonitor implements Runnable {
         }
         return jsonArray.toJSONString();
     }
+
+    public Map<String, Object> getHostHardWareInfo(String ip){
+        Map<String, Object> result = new HashMap<>();
+        result.put("CPU",ip);
+        result.put("Memory",ip);
+        result.put("Disk",ip);
+        result.put("GPU",ip);
+        return result;
+    }
+    public String getHostHardWareInfoListOutputData(){
+        JSONArray jsonArray = new JSONArray();
+        for(HostInfo hostInfo:hostInfoList){
+            Map<String, Object> result = getHostHardWareInfo(hostInfo.ip);
+            JSONObject jsonObject = new JSONObject(result);
+            jsonArray.add(jsonObject);
+        }
+
+        return jsonArray.toJSONString();
+    }
+
     //获取Host的IP
     public String getHostIpList(){
         JSONArray jsonArray = new JSONArray();
