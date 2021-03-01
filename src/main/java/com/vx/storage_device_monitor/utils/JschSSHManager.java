@@ -3,6 +3,7 @@ package com.vx.storage_device_monitor.utils;
 import com.jcraft.jsch.*;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,14 +37,15 @@ public class JschSSHManager implements SSHManager{
                 //创建session并且打开连接，因为创建session之后要主动打开连接
                 currentSession = mainJSCH.getSession(hostConfigInfo.username, hostConfigInfo.ip, 22);
                 currentSession.setPassword(hostConfigInfo.password);
-                //session.setUserInfo(userInfo);
                 java.util.Properties config = new java.util.Properties();
                 config.put("StrictHostKeyChecking", "no");
                 currentSession.setConfig(config);
                 currentSession.connect();
+                sessionMap.put(hostConfigInfo.ip,currentSession);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            handleException(currentSession,hostConfigInfo.ip);
         }
         return currentSession;
     }
@@ -52,13 +54,13 @@ public class JschSSHManager implements SSHManager{
     @Override
     public List<String> runCommand(String command, HostConfigInfo hostConfigInfo){
         List<String> result = new ArrayList<String>();
-
         int returnCode = 0;
         com.jcraft.jsch.Session session = getJSCHSession(hostConfigInfo);
+        ChannelExec channelExec = null;
         try {
             //打开通道，设置通道类型，和执行的命令
             Channel channel = session.openChannel("exec");
-            ChannelExec channelExec = (ChannelExec)channel;
+            channelExec = (ChannelExec)channel;
             channelExec.setCommand(command);
 
             channelExec.setInputStream(null);
@@ -71,24 +73,37 @@ public class JschSSHManager implements SSHManager{
                 result.add(line);
             }
             input.close();
-
             // 得到returnCode
             if (channelExec.isClosed()) {
                 returnCode = channelExec.getExitStatus();
             }
-
             // 关闭通道
             channelExec.disconnect();
             //关闭session
             //session.disconnect();
+        }
+        catch (JSchException e) {
+            e.printStackTrace();
+            //处理异常，关闭连接
+            handleException(session,hostConfigInfo.ip);
+            channelExec.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+            //处理异常，关闭连接
+            handleException(session,hostConfigInfo.ip);
+            channelExec.disconnect();
 
-        } catch (JSchException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return result;
     }
 
+    //处理异常
+    public void handleException(com.jcraft.jsch.Session currentSession,String _ip){
+        if (currentSession != null) {
+            currentSession.disconnect();
+        }
+        if(sessionMap.containsKey(_ip)){
+            sessionMap.remove(_ip);
+        }
+    }
 }

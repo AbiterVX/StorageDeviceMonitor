@@ -18,7 +18,7 @@ public class MainController {
     //主机监控类
     private HostMonitor hostMonitor;
     public MainController(){
-        hostMonitor = new HostMonitor(2000);
+        hostMonitor = new HostMonitor(5000);
         //后台开启线程：用于数据采样
         hostMonitor.start();
     }
