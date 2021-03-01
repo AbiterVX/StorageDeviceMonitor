@@ -1,6 +1,9 @@
 package com.vx.storage_device_monitor.service;
 
+import com.vx.storage_device_monitor.dao.entity.FieldType;
+
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface Service_Interface {
 
@@ -11,4 +14,7 @@ public interface Service_Interface {
     String getHostInfoListOutputData();
 
     String getHostIpList();
+
+    String getSingleNewestInfoByIp(String ip);
+    String getRecentInfoByIp(String ip, int numberOfDays, FieldType fieldType);
 }

@@ -3,12 +3,12 @@ package com.vx.storage_device_monitor.dao.entity;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class diskUsageRecord {
+public class DiskUsageRecord {
     private Timestamp timestamp;
     private BigDecimal diskUsage;
     private float diskUsagef;
 
-    public diskUsageRecord(Timestamp timestamp, BigDecimal diskUsage) {
+    public DiskUsageRecord(BigDecimal diskUsage,Timestamp timestamp) {
         this.timestamp = timestamp;
         this.diskUsage = diskUsage;
         this.diskUsagef=diskUsage.floatValue();
