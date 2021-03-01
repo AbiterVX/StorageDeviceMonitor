@@ -3,7 +3,7 @@ package com.vx.storage_device_monitor.dao.entity;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class Record {
+public class record {
     private String ip;
     private Timestamp timestamp;
     private BigDecimal receiveBW;
@@ -22,11 +22,11 @@ public class Record {
     private float cpuUsagef;
     private float memoryUsagef;
     private float diskUsagef;
+
     private float tempf;
     private float energyf;
 
-
-    public Record(String ip, Timestamp timestamp, BigDecimal receiveBW, BigDecimal transmitBW, BigDecimal cpuUsage, BigDecimal memoryUsage, BigDecimal diskUsage,Integer iNumber, Integer oNumber,BigDecimal temp, BigDecimal energy) {
+    public record(String ip, Timestamp timestamp, BigDecimal receiveBW, BigDecimal transmitBW, BigDecimal cpuUsage, BigDecimal memoryUsage, BigDecimal diskUsage, BigDecimal temp, BigDecimal energy, Integer iNumber, Integer oNumber) {
         this.ip = ip;
         this.timestamp = timestamp;
         this.receiveBW = receiveBW;

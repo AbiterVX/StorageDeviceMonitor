@@ -47,7 +47,7 @@ public class HostMonitor implements Runnable {
     //---------Init
     public HostMonitor(){
         //延迟时间默认为2000，单位：ms
-        this(120000);
+        this(2000);
     }
 
     public boolean isDataHasBeenWritten() {
@@ -198,7 +198,6 @@ public class HostMonitor implements Runnable {
     @Override
     public void run() {
         while(threadStart){
-            while(!isDataHasBeenWritten)
             //采样
             sampleAll();
             //获取
@@ -208,7 +207,6 @@ public class HostMonitor implements Runnable {
             }
             */
             //等待
-            setDataHasBeenWritten(false);
             try {
                 Thread.sleep(interval_ms);
             }

@@ -1,10 +1,8 @@
 package com.vx.storage_device_monitor.controller;
 
 
-import com.vx.storage_device_monitor.service.Service_Implementation;
 import com.vx.storage_device_monitor.utils.HostConfigInfo;
 import com.vx.storage_device_monitor.utils.HostMonitor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,13 +16,11 @@ import java.util.List;
 @Controller
 public class MainController {
     //主机监控类
-    //private HostMonitor hostMonitor;
-    @Autowired
-    Service_Implementation service_implementation;
+    private HostMonitor hostMonitor;
     public MainController(){
-        //hostMonitor = new HostMonitor(5000);
+        hostMonitor = new HostMonitor(5000);
         //后台开启线程：用于数据采样
-        //hostMonitor.start();
+        hostMonitor.start();
     }
 
     //index界面/主界面
@@ -43,7 +39,7 @@ public class MainController {
     @ResponseBody
     @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)
     public String postGetHostInfoList(){
-        String result = service_implementation.getHostInfoListOutputData();
+        String result = hostMonitor.getHostInfoListOutputData();
         System.out.println(result);
         return result;
     }
@@ -52,7 +48,7 @@ public class MainController {
     @ResponseBody
     @RequestMapping(value = "/getHostIpList", method = RequestMethod.POST)
     public String postGetHostIpList(){
-        String result = service_implementation.getHostIpList();
+        String result = hostMonitor.getHostIpList();
         System.out.println(result);
         return result;
     }

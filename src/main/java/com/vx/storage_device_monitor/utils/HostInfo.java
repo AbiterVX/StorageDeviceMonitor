@@ -1,6 +1,5 @@
 package com.vx.storage_device_monitor.utils;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -125,7 +124,7 @@ public class HostInfo {
         ;
         //System.out.println(date.toString());
 
-        resultMap.put("timestamp",new Timestamp(System.currentTimeMillis()));
+        resultMap.put("date",System.currentTimeMillis());
         resultMap.put("ip",ip);
         resultMap.put("receiveBW",netBindWidth[0]);
         resultMap.put("transmitBW",netBindWidth[1]);

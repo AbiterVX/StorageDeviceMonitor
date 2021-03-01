@@ -1,7 +1,9 @@
 package com.vx.storage_device_monitor.dao;
 
 
-import com.vx.storage_device_monitor.dao.entity.*;
+import com.vx.storage_device_monitor.dao.entity.BWrecord;
+import com.vx.storage_device_monitor.dao.entity.IOrecord;
+import com.vx.storage_device_monitor.dao.entity.record;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +14,6 @@ import java.util.List;
 
 @Mapper
 public interface Dao_record {
-
     @Insert("insert into NodeRecord values\n"+
             "(#{ip},#{timestamp},#{receiveBW},#{transmitBW},#{cpuUsage},#{memoryUsage},#{diskUsage},#{iNumber},#{oNumber},#{temp},#{energy})"
             )
@@ -29,66 +30,55 @@ public interface Dao_record {
                          @Param("energy")float energy
                          );
     @Select("select * from NodeRecord where ip=#{ip}")
-    List<Record> recordQueryWithIP(@Param("ip") String ip);
+    List<record> recordQueryWithIP(@Param("ip") String ip);
 
     @Select("select * from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp " )
-    List<Record> recordQueryWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
+    List<record> recordQueryWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
     @Select("select receiveBW,transmitBW,timestamp from NodeRecord " +
             "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
             "order by timestamp")
     List<BWrecord> getBWWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
 
-    @Select("select transmitBW,timestamp from NodeRecord " +
+    @Select("select transmitBW from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp"  )
-    List<BWrecord2> getTransmitBWWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
+    List<Float> getTransmitBWWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select receiveBW,timestamp from NodeRecord " +
-            "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
-            "order by timestamp"  )
-    List<BWrecord2> getReceiveBWWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
-    @Select("select memoryUsage,timestamp from NodeRecord " +
+    @Select("select memoryUsage from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp" )
-    List<MemoryUsageRecord> getMemoryUsageWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
+    List<Float> getMemoryUsageWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select diskUsage,timestamp from NodeRecord " +
+    @Select("select diskUsage from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp" )
-    List<DiskUsageRecord> getDiskUsageWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
+    List<Float> getDiskUsageWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select temp,timestamp from NodeRecord " +
+    @Select("select temp from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp" )
-    List<TemperatureRecord> getTempWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
+    List<Float> getTempWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select cpuUsage,timestamp from NodeRecord " +
+    @Select("select cpuUsage from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp" )
-    List<CpuUsageRecord> getCpuUsageWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
+    List<Float> getCpuUsageWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select energy,timestamp from NodeRecord " +
+    @Select("select energy from NodeRecord " +
             "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
             "order by timestamp" )
-    List<EnergyRecord> getEnergyWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
+    List<Float> getEnergyWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
     @Select("select iNumber,oNumber,timestamp from NodeRecord " +
             "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
             "order by timestamp")
     List<IOrecord> getIOWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select iNumber,timestamp from NodeRecord " +
-            "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
-            "order by timestamp")
-    List<IOrecord2> getInumberWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
-    @Select("select oNumber,timestamp from NodeRecord " +
-            "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
-            "order by timestamp")
-    List<IOrecord2> getOnumberWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
+
 
 
 }
