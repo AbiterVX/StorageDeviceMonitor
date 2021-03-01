@@ -1,7 +1,9 @@
 package com.vx.storage_device_monitor.service;
 
+import com.alibaba.fastjson.JSON;
 import com.vx.storage_device_monitor.dao.Dao_record;
 import com.vx.storage_device_monitor.dao.entity.BWrecord;
+import com.vx.storage_device_monitor.dao.entity.FieldType;
 import com.vx.storage_device_monitor.dao.entity.IOrecord;
 import com.vx.storage_device_monitor.utils.HostMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,12 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     }
 
     @Override
+    public String getSingleNewestInfoByIp(String ip) {
+        return JSON.toJSONString(newestData(ip));
+
+    }
+
+    @Override
     public String getHostInfoListOutputData() {
         return hostMonitor.getHostInfoListOutputData();
     }
@@ -67,13 +75,13 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                 while(hostMonitor.isDataHasBeenWritten());
                 List<Map<String,Object>> listForWritten=hostMonitor.getOriginalHostInfoListOutputData();
                 for(Map<String,Object> iterable:listForWritten){
-                    dao_record.insertNewRecord((String)iterable.get("ip"),new Timestamp(System.currentTimeMillis()),(float)iterable.get("receiveBW"),(float)iterable.get("transmitBW"),
+                    dao_record.insertNewRecord((String)iterable.get("ip"),(Timestamp) iterable.get("timestamp"),(float)iterable.get("receiveBW"),(float)iterable.get("transmitBW"),
                             (float)iterable.get("cpuUsage"), (float)iterable.get("memoryUsage"),(float)iterable.get("diskUsage"),250,250,36.0f,600.0f);
                 }
                 //等待
                 hostMonitor.setDataHasBeenWritten(true);
                 try {
-                    Thread.sleep(interval_ms);
+                    Thread.sleep(interval_ms-1000);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -82,7 +90,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         }
     }
 
-    public Map<String,Object> newestData(String ip){
+    private Map<String,Object> newestData(String ip){
         List<Map<String,Object>> temp=hostMonitor.getOriginalHostInfoListOutputData();
         for(Map<String,Object> iterable:temp){
             if(iterable.get("ip").equals(ip)){
@@ -91,10 +99,57 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         }
         return null;
     }
-    public List<BWrecord> getBWInTimeRange(Timestamp lowbound,Timestamp highbound,String ip){
-        return dao_record.getBWWithTimestamp(lowbound,highbound,ip);
+    public List<BWrecord> getBWInTimeRange(String ip,int numberOfDays){
+        return dao_record.getBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),new Timestamp(System.currentTimeMillis()),ip);
     }
-    public List<IOrecord> getIOInTimeRange(Timestamp lowbound, Timestamp highbound, String ip){
-        return dao_record.getIOWithTimestamp(lowbound,highbound,ip);
+    public List<IOrecord> getIOInTimeRange(String ip,int numberOfDays){
+        return dao_record.getIOWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),new Timestamp(System.currentTimeMillis()),ip);
+    }
+    @Override
+    public String getRecentInfoByIp(String ip, int numberOfDays, FieldType fieldType) {
+        String result;
+        switch(fieldType){
+            case CPUUSAGE:
+                result=JSON.toJSONString(dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case MEMORYUSAGE:
+                result=JSON.toJSONString(dao_record.getMemoryUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case DISKUSAGE:
+                result=JSON.toJSONString(dao_record.getDiskUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case RECEIVEBANDWIDTH:
+                result=JSON.toJSONString(dao_record.getReceiveBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case TRANSMITBANDWIDTH:
+                result=JSON.toJSONString(dao_record.getTransmitBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case INPUTNUMBER:
+                result=JSON.toJSONString(dao_record.getInumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case OUTPUTNUMBER:
+                result=JSON.toJSONString(dao_record.getOnumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case TEMPERATURE:
+                result=JSON.toJSONString(dao_record.getTempWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            case ENERGY:
+                result=JSON.toJSONString(dao_record.getEnergyWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+            default:
+                result=JSON.toJSONString(dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                        new Timestamp(System.currentTimeMillis()),ip));
+                break;
+        }
+        return result;
     }
 }
