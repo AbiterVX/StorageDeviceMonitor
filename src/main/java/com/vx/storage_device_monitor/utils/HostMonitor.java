@@ -39,12 +39,26 @@ public class HostMonitor implements Runnable {
     private Thread newThread;
     //线程开始
     public boolean threadStart;
+    private boolean isDataHasBeenWritten=true;
+
+
+
 
     //---------Init
     public HostMonitor(){
         //延迟时间默认为2000，单位：ms
         this(2000);
     }
+
+    public boolean isDataHasBeenWritten() {
+        return isDataHasBeenWritten;
+    }
+
+    public void setDataHasBeenWritten(boolean dataHasBeenWritten) {
+        isDataHasBeenWritten = dataHasBeenWritten;
+    }
+
+
     public HostMonitor(int _interval_ms){
         //配置信息
         configInfo = new Config();
@@ -170,6 +184,14 @@ public class HostMonitor implements Runnable {
             jsonArray.add(hostInfo.ip);
         }
         return jsonArray.toJSONString();
+    }
+    public List<Map<String,Object>> getOriginalHostInfoListOutputData(){
+        ArrayList<Map<String,Object>> mapList=new ArrayList<>();
+        for(HostInfo hostInfo:hostInfoList){
+            Map<String, Object> result = hostInfo.getOutputData(interval_ms);
+            mapList.add(result);
+        }
+        return mapList;
     }
     //---------多线程执行
     //多线程运行
