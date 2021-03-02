@@ -33,6 +33,27 @@ public class MainController {
         return "html/HomePage.html";
     }
 
+
+    //index界面/主界面
+    @RequestMapping(value ="/HomePage", method = RequestMethod.GET)
+    public String getHomePage(){
+        return "html/HomePage.html";
+    }
+
+    //资源利用界面
+    @RequestMapping(value ="/CheckHostInfo", method = RequestMethod.GET)
+    public String getCheckHostInfoPage(){
+        return "html/CheckHostInfo.html";
+    }
+
+    //磁盘故障界面
+    @RequestMapping(value ="/CheckDiskFailureInfo", method = RequestMethod.GET)
+    public String getCheckDiskFailureInfoPage(){
+        return "html/CheckDiskFailureInfo.html";
+    }
+
+
+
     //测试界面
     @RequestMapping(value ="Test", method = RequestMethod.GET)
     public String Test(){

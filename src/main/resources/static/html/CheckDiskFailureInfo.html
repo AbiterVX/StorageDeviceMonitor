@@ -68,8 +68,9 @@
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
+
                         <li class="nav-item">
-                            <a class="nav-link active;" style="color:black;font-weight:bold;" href="/">
+                            <a class="nav-link active;"  href="/">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                                 设备配置 <span class="sr-only">(current)</span>
                             </a>
@@ -82,7 +83,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="CheckDiskFailureInfo">
+                            <a class="nav-link" href="CheckDiskFailureInfo" style="color:black;font-weight:bold;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
                                 磁盘故障
                             </a>
@@ -117,32 +118,9 @@
                 </div>
 
 
-                <!-- 资源使用-标题-->
+                <!-- 磁盘故障信息-标题-->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">实时资源利用率</h2>
-                </div>
-                <!-- 资源使用-表格 -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                            <tr>
-                                <th scope="col">IP</th>
-                                <th scope="col">CPU利用率</th>
-                                <th scope="col">内存利用率</th>
-                                <th scope="col">磁盘利用率</th>
-                                <th scope="col">网络接受数据</th>
-                                <th scope="col">网络发送数据</th>
-                            </tr>
-                        </thead>
-                        <tbody id ="HostInfoListTable">
-                        </tbody>
-                    </table>
-                </div>
-
-
-                <!-- 设备配置-标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">设备配置</h2>
+                    <h2 class="h2">磁盘故障信息</h2>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             0.0.0.0
@@ -153,57 +131,70 @@
                     </div>
                 </div>
 
-
-
-
-                <!-- 设备配置-表格 -->
+                <!-- 磁盘故障信息-表格 -->
                 <div class="table-responsive">
                     <table class="table table-striped table-sm">
                         <thead>
                         <tr>
-                            <th scope="col">名称</th>
-                            <th scope="col">配置</th>
-                            <th scope="col">当前使用</th>
+                            <th scope="col">时间</th>
+                            <th scope="col">故障类别</th>
+                            <th scope="col">详情</th>
                         </tr>
                         </thead>
-                        <tbody id ="HostHardWareInfoListTable">
+                        <tbody id ="DiskFailureInfoList">
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 分页按钮 -->
+                <nav aria-label="Page navigation example " >
+                    <ul class="pagination justify-content-center" id="PageNumList">
+                        <!--
+                        <li id="PagePreviousBtn" class="page-item" onclick="FPreviousPage()">
+                            <a class="page-link" href="#" aria-label="Previous">Previous</a>
+                        </li>
+                        <li id="PageNumList">
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item disabled"><a class="page-link" href="#">4</a></li>
+                            <li class="page-item"><a class="page-link" href="#">5</a></li>
+                            <li class="page-item"><a class="page-link" href="#">6</a></li>
+                        </li>
+                        <li id="PageNextBtn" class="page-item disabled " onclick="FNextPage()">
+                            <a class="page-link" href="#" aria-label="Next">Next</a>
+                        </li>
+                        -->
+                    </ul>
+                </nav>
+
+
             </main>
         </div>
     </div>
 </body>
 
 <script >
-    //更新间隔
-    var refreshInterval = 1000 * 5;
-    //更新Host信息定时任务
-    var refreshHostInfoList;
-    //主机信息表
-    var hostInfoListTable = document.getElementById("HostInfoListTable");
-    //host设备配置表
-    var hostHardWareInfoListTable = document.getElementById("HostHardWareInfoListTable");
+    //磁盘故障信息
+    var diskFailureInfoList = document.getElementById("DiskFailureInfoList");
     //下拉菜单-当前选择的host index
     var currentHostIpIndex = 0;
+
     //页面加载完成后执行
     window.onload=function (){
+        //分页
+        FRefreshPageNumList();
+
         //设置主机IP列表
         FSetHostIpList("HostIpList");
         //设置下拉菜单
         FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
-        //定时刷新数据
-        FRefreshHostInfoList();
-        refreshHostInfoList = window.setInterval (FRefreshHostInfoList,refreshInterval);
-        //取消定时任务
-        //window.clearInterval(FGetHostIpList);
-
         //设备配置信息
-        FRefreshHostHardWareInfoList();
+        FRefreshDiskFailureInfoList();
     }
 
-
-    function FRefreshHostHardWareInfoList(){
+    //磁盘故障信息刷新
+    function FRefreshDiskFailureInfoList(){
         var jsonData = FGetHostHardWareInfoList();
         if(jsonData != null){
             var html = "";
@@ -211,50 +202,106 @@
             html += '<tr><th scope="row">Memory</th><td>'+ jsonData[currentHostIpIndex]["Memory"]+'</td><td>--</td></tr>';
             html += '<tr><th scope="row">Disk</th><td>'+ jsonData[currentHostIpIndex]["Disk"]+'</td><td>--</td></tr>';
             html += '<tr><th scope="row">GPU</th><td>'+ jsonData[currentHostIpIndex]["GPU"]+'</td><td>--</td></tr>';
-            hostHardWareInfoListTable.innerHTML = html;
+            diskFailureInfoList.innerHTML = html;
         }
     }
 
-    function FGetHostInfo(currentHostIp){
-        //alert(currentHostIp)
-    }
-    //[定时更新]更新主机信息
-    function FRefreshHostInfoList() {
-        var jsonData = FGetHostInfoList();
-        if(jsonData != null){
-            var HostIpListHtml = ""
-            for(var i=0;i< jsonData.length;i++){
-                HostIpListHtml +=   '<tr>' +
-                    '  <th scope="row">'+jsonData[i]["ip"]  +'</th>' +
-                    '  <td>'+
-                    '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
-                    '      <div style="width: '+ jsonData[i]["cpuUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["cpuUsage"]+'%</h6>' +
-                    '  </div></td>' +
-
-                    '  <td>'+
-                    '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
-                    '      <div style="width: '+ jsonData[i]["memoryUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["memoryUsage"]+'%</h6>' +
-                    '  </div></td>' +
-
-                    '  <td>'+
-                    '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
-                    '      <div style="width: '+ jsonData[i]["diskUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["diskUsage"]+'%</h6>' +
-                    '  </div></td>' +
-
-                    '  <td>'+jsonData[i]["receiveBW"]  +' Kb/s</td>' +
-                    '  <td>'+jsonData[i]["transmitBW"]  +'Kb/s</td>' +
-                    '</tr>';
-            }
-            hostInfoListTable.innerHTML = HostIpListHtml;
-        }
-    }
     //下拉菜单选项回调
     function FSelectBtnCallback(index){
         currentHostIpIndex = index;
-        FRefreshHostHardWareInfoList();
+        FRefreshDiskFailureInfoList();
+    }
+
+    //当前页index
+    var currentPageIndex = 1;
+    //最小页index值
+    var pageNumMin = 1;
+    //最大页index值
+    var pageNumMax = 15;
+    //最多能显示的分页按钮个数
+    var pageShowBtnNumMax = 10;
+    //分页按钮位置
+    var pageNumList = document.getElementById("PageNumList");
+
+    //分页：下一页
+    function FNextPage(){
+        if(currentPageIndex < pageNumMax){
+            currentPageIndex +=1;
+            FRefreshPageNumList();
+        }
+    }
+    //分页：上一页
+    function FPreviousPage(){
+        if(currentPageIndex > pageNumMin){
+            currentPageIndex -=1;
+            FRefreshPageNumList();
+        }
+    }
+    //分页：跳转
+    function FGoPage(index){
+        currentPageIndex = index;
+        FRefreshPageNumList();
+    }
+    //分页：刷新分页按钮
+    function FRefreshPageNumList(){
+        //上一页
+        var pageNumListHtml = "";
+        if(pageNumMin === currentPageIndex){
+            pageNumListHtml+=
+                '<li id="PagePreviousBtn" class="page-item disabled" onclick="FPreviousPage()">\n' +
+                '    <a class="page-link" href="#" aria-label="Previous">Previous</a>\n' +
+                '</li>'
+        }
+        else{
+            pageNumListHtml+=
+                '<li id="PagePreviousBtn" class="page-item" onclick="FPreviousPage()">\n' +
+                '    <a class="page-link" href="#" aria-label="Previous">Previous</a>\n' +
+                '</li>'
+        }
+
+        //分页按钮设定区间
+        var beginIndex = pageNumMin;
+        var endIndex = pageNumMax;
+        if((pageNumMax - pageNumMin) > pageShowBtnNumMax){
+            if((pageNumMin + pageShowBtnNumMax/2) > currentPageIndex){
+                endIndex = pageNumMin + (pageShowBtnNumMax - 1);
+            }
+            else if((pageNumMax - pageShowBtnNumMax/2) < currentPageIndex){
+                beginIndex = pageNumMax - (pageShowBtnNumMax - 1);
+            }
+            else{
+                beginIndex = currentPageIndex - pageShowBtnNumMax/2;
+                endIndex = beginIndex + (pageShowBtnNumMax - 1);
+            }
+        }
+
+        //分页按钮列表内容
+        for(var i=beginIndex;i<=endIndex;i++){
+            if(i == currentPageIndex){
+                pageNumListHtml += '<li class="page-item active"><a class="page-link" href="#">'+ i +'</a></li>'
+            }
+            else{
+                pageNumListHtml += '<li class="page-item" onclick="FGoPage('+ i +')"><a class="page-link" href="#">'+ i +'</a></li>'
+            }
+        }
+
+        //下一页
+        if( currentPageIndex === pageNumMax){
+            pageNumListHtml+=
+                '<li id="PageNextBtn" class="page-item disabled " onclick="FNextPage()">\n' +
+                '    <a class="page-link" href="#" aria-label="Next">Next</a>\n' +
+                '</li>'
+        }
+        else{
+            pageNumListHtml+=
+                '<li id="PageNextBtn" class="page-item " onclick="FNextPage()">\n' +
+                '    <a class="page-link" href="#" aria-label="Next">Next</a>\n' +
+                '</li>'
+        }
+
+
+        pageNumList.innerHTML = pageNumListHtml;
+
     }
 </script>
 </html>

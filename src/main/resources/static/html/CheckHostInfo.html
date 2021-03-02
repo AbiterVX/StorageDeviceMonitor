@@ -71,7 +71,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="Test">
+                            <a class="nav-link" href="CheckDiskFailureInfo">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
                                 磁盘故障
                             </a>
@@ -112,29 +112,28 @@
                         </div>
                     </div>
                 </div>
-                <!-- CPU利用率标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">CPU利用率</h2>
-                </div>
-                <!-- CPU利用率图表-->
-                <div id="CpuUsageChart" style="width: 100%;height: 420px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;" >
-                    <div style="position: relative; cursor: default; ">
-                        <canvas data-zr-dom-id="zr_0"  style=" position: absolute;  user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                        </canvas>
-                    </div>
-                </div>
 
-                <!-- 内存利用率标题-->
+
+                <!-- 利用率标题-->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">内存利用率</h2>
+                    <h2 class="h2">利用率</h2>
                 </div>
-                <!-- 内存利用率图表-->
-                <div id="MemoryUsageChart" style="width: 100%;height: 420px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;">
-                    <div style=";position: relative; cursor: default; ">
-                        <canvas data-zr-dom-id="zr_0"  style=" position: absolute; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                        </canvas>
-                    </div>
+                <!-- 利用率图表-->
+                <div id="UsageChart" style="width: 100%;height: 350px;"></div>
+
+                <!-- 温度标题-->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h2">温度</h2>
                 </div>
+                <!-- 温度图表-->
+                <div id="TemperatureChart" style="width: 100%;height: 350px;"></div>
+
+                <!-- 网络带宽标题-->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h2">网络带宽</h2>
+                </div>
+                <!-- 网络带宽图表-->
+                <div id="NetBindWidthChart" style="width: 100%;height: 350px;"></div>
             </main>
         </div>
     </div>
@@ -142,25 +141,26 @@
 
 <script >
     //更新间隔
-    var refreshInterval = 1000 * 2;
+    var refreshInterval = 1000 * 5;
     //更新Host信息定时任务
     var refreshHostInfoList;
     //下拉菜单-当前选择的host index
     var currentHostIpIndex = 0;
 
-    //[CPU]利用率数据
-    var CpuUsageData = new Array();
-    //[CPU]利用率表
-    var cpuUsageChart;
-    //[内存]利用率数据
-    var memoryUsageData = new Array();
-    //[内存]利用率表
-    var memoryUsageChart;
-    //[磁盘]利用率
-    var diskUsage
-    //[网络带宽]receiveBW  KB/S
-    //[网络带宽]transmitBW KB/S
-
+    //-----利用率表
+    //利用率
+    var usageChart = echarts.init(document.getElementById("UsageChart"));
+    //温度
+    var temperatureChart = echarts.init(document.getElementById("TemperatureChart"));
+    //网络带宽
+    var netBindWidthChart = echarts.init(document.getElementById("NetBindWidthChart"));
+    //-----利用率数据
+    //CPU
+    var usageData = [ [],[], []  ];
+    //内存
+    var temperatureData = [ [] ];
+    //网络带宽
+    var netBindWidthData = [ [], [] ];
 
     //页面加载完成后执行
     window.onload=function (){
@@ -168,15 +168,14 @@
         FSetHostIpList("HostIpList");
         //设置下拉菜单
         FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
-        //初始化CPU利用率表格
-        cpuUsageChart = echarts.init(document.getElementById("CpuUsageChart"));
-        FInitTable("CPU利用率","利用率",true,cpuUsageChart,CpuUsageData);
-        //初始化内存利用率表格
-        memoryUsageChart = echarts.init(document.getElementById("MemoryUsageChart"));
-        FInitTable("内存利用率","利用率",true,memoryUsageChart,memoryUsageData);
+
+        //-----初始化利用率表格
+        FInitTable(usageChart,usageData,["CPU","内存","磁盘"],"%");
+        FInitTable(temperatureChart,temperatureData,["温度"],"℃");
+        FInitTable(netBindWidthChart,netBindWidthData,["数据接受","数据发送"],"Kb/s");
+
         //定时刷新数据
         refreshHostInfoList = window.setInterval (FRefreshHostInfoList,refreshInterval);
-
         //取消定时任务
         //window.clearInterval(FGetHostIpList);
     }
@@ -199,38 +198,44 @@
             var s = date.getSeconds();
             var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
             //dateString = date.format("yyyy/MM/dd hh:mm:ss");
-            //alert(dateString);
+
             //插入信息数据与更新表格
-            FAddData(cpuUsageChart,CpuUsageData,jsonData[currentHostIpIndex]["ip"],[ dateString, jsonData[currentHostIpIndex]["cpuUsage"] ]);
-            FAddData(memoryUsageChart,memoryUsageData,jsonData[currentHostIpIndex]["ip"],[ dateString, jsonData[currentHostIpIndex]["memoryUsage"] ]);
+            FAddData(usageChart,usageData,jsonData[currentHostIpIndex]["ip"],
+                [
+                    [ dateString, jsonData[currentHostIpIndex]["cpuUsage"] ],
+                    [ dateString, jsonData[currentHostIpIndex]["memoryUsage"] ],
+                    [ dateString, jsonData[currentHostIpIndex]["diskUsage"] ],
+                ]);
+            FAddData(temperatureChart,temperatureData,jsonData[currentHostIpIndex]["ip"],
+                [
+                    [ dateString, jsonData[currentHostIpIndex]["memoryUsage"] ],
+                ]);
+            FAddData(netBindWidthChart,netBindWidthData,jsonData[currentHostIpIndex]["ip"],
+                [
+                    [ dateString, jsonData[currentHostIpIndex]["receiveBW"] ],
+                    [ dateString, jsonData[currentHostIpIndex]["transmitBW"] ],
+                ]);
         }
     }
 
     //初始化图表
-    function FInitTable(titleTxt,tooltipValueLabel,isPercent,currentChart,currentData){
-        var percentString = "";
-        if(isPercent){
-            percentString = " %";
-        }
+    function FInitTable(currentChart,currentData,seriesName,unitLabel){
         var option = {
-            /*title: {
-                text: titleTxt
-            },*/
             grid: {
                 left: '2%',
                 right: '2%',
-                top: '2%',
-                bottom: '10%',
+                top: '10%',
+                bottom: '8%',
                 containLabel: true
             },
             tooltip: {
                 trigger: 'axis',
-                formatter: function (params) {
-                    params = params[0];
-                    return '时间:'+ params.value[0] + '<br/> '+tooltipValueLabel+':' + params.value[1] + percentString;
-                },
-                axisPointer: {
-                    animation: false
+                formatter: function(params){
+                    var returnTxt = "时间: "+params[0].value[0] +"<br/>";
+                    for(var i =0; i< params.length; i++){
+                        returnTxt += params[i].marker+" "+params[i].seriesName+ " "+params[i].value[1] + unitLabel + "<br/>";
+                    }
+                    return returnTxt;
                 }
             },
             xAxis: {
@@ -254,58 +259,108 @@
             yAxis: {
                 type: 'value',
                 boundaryGap: [0, '100%'],
-                max: 100,
+                /*max: 100,
                 min: 0,
-                interval:20,
+                interval:20,*/
                 splitLine: {
                     show: true
                 },
                 axisLabel: {
-                    formatter: '{value}'+ percentString
+                    formatter: '{value}'+ unitLabel
                 }
             },
+            legend: {
+                data: seriesName
+            },
             series: [{
-                name: '模拟数据',
+                name: '利用率',
                 type: 'line',
                 showSymbol: false,
                 hoverAnimation: false,
                 data: currentData
-            }]
+            },]
         };
+        //单位为百分比，设置间距与范围
+        if(unitLabel === "%" || unitLabel === "℃"){
+            option["yAxis"]["max"] = 100;
+            option["yAxis"]["min"] = 0;
+            option["yAxis"]["interval"] = 20;
+        }
+        //series
+
+        option["series"] = [];
+
+        for(var i=0;i<seriesName.length;i++){
+            option["series"].push({
+                name: seriesName[i],
+                type: 'line',
+                showSymbol: false,
+                hoverAnimation: false,
+                data: currentData[i],
+            })
+        }
+
         if (option && typeof option === 'object') {
             currentChart.setOption(option);
         }
     }
-    //向图表添加信息
+
     function FAddData(currentChart,currentData,newDataName,newDataValue){
-        if(currentData.length > 1000){
-            currentData.shift();
+
+        if(currentData[0].length > 24*60){
+            for(var i=0;i<currentData.length;i++){
+                currentData[i].shift();
+            }
         }
-        currentData.push({
-            name: newDataName,
-            value:newDataValue
-        });
-        currentChart.setOption({
-            series: [{
-                data: currentData
-            }]
-        });
-    }
-    //下拉菜单选项回调
-    function FSelectBtnCallback(index){
-        currentHostIpIndex = index;
-        CpuUsageData = [];
-        memoryUsageData = [];
-        FClearChart(cpuUsageChart);
-        FClearChart(memoryUsageChart);
+
+        for(var i=0;i<currentData.length;i++){
+            currentData[i].push({
+                name: newDataName,
+                value:newDataValue[i]
+            });
+        }
+        var option = {
+            series: []
+        };
+
+        for(var i=0;i<currentData.length;i++){
+            option["series"].push({
+                data:currentData[i]
+            })
+        }
+        currentChart.setOption(option);
     }
 
-    function FClearChart(currentChart){
-        currentChart.setOption({
-            series: [{
+    //下拉菜单选项回调
+    function FSelectBtnCallback(index){
+        //设置当前选中的索引
+        currentHostIpIndex = index;
+        //清除图表
+        //CPU
+        usageData = [ [],[], []  ];
+        //内存
+        temperatureData = [ [] ];
+        //网络带宽
+        netBindWidthData = [ [], [] ];
+
+        FClearChart(usageData,usageChart);
+        FClearChart(temperatureData,temperatureChart);
+        FClearChart(netBindWidthData,netBindWidthChart);
+
+    }
+
+    //清除图表数据
+    function FClearChart(currentData,currentChart){
+        var options = {
+            series: []
+        };
+
+        for(var i=0;i<currentData.length;i++){
+            option["series"].push({
                 data: []
-            }]
-        });
+            })
+        }
+        currentChart.setOption(options);
     }
 </script>
 
