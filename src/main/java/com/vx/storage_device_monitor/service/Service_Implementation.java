@@ -1,10 +1,12 @@
 package com.vx.storage_device_monitor.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.vx.storage_device_monitor.dao.Dao_record;
 import com.vx.storage_device_monitor.dao.entity.BWrecord;
 import com.vx.storage_device_monitor.dao.entity.FieldType;
 import com.vx.storage_device_monitor.dao.entity.IOrecord;
+import com.vx.storage_device_monitor.dao.entity.Record;
 import com.vx.storage_device_monitor.utils.HostMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -30,9 +32,14 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         startMonitor();
         periodPersistence();
+        try {
+            hostMonitor.getNewThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -40,6 +47,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         if(pThread==null) {
             pThread = new Thread(new PersistenceThread(), "The thread to persist");
             pThread.start();
+
         }
     }
 
@@ -53,7 +61,9 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     public String getHostInfoListOutputData() {
         return hostMonitor.getHostInfoListOutputData();
     }
-
+    public String getHostHardwareInfoListOutputData(){
+        return hostMonitor.getHostHardWareInfoListOutputData();
+    }
     @Override
     public String getHostIpList() {
         return hostMonitor.getHostIpList();
@@ -71,6 +81,11 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         @Override
         public void run() {
             while(hostMonitor.threadStart){
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 //采样
                 while(hostMonitor.isDataHasBeenWritten());
                 List<Map<String,Object>> listForWritten=hostMonitor.getOriginalHostInfoListOutputData();
@@ -81,7 +96,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                 //等待
                 hostMonitor.setDataHasBeenWritten(true);
                 try {
-                    Thread.sleep(interval_ms-1000);
+                    Thread.sleep(interval_ms);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -151,5 +166,37 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                 break;
         }
         return result;
+    }
+    public String getFullRecordsByIP(String ip, int numberOfDays){
+        int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        Float[] temp=new Float[numberOfEntry];
+        Float[] cpuUsage=new Float[numberOfEntry];
+        Float[] diskUsage=new Float[numberOfEntry];
+        Float[] memoryUsage=new Float[numberOfEntry];
+        Float[] receiveBW=new Float[numberOfEntry];
+        Float[] transmitBW=new Float[numberOfEntry];
+        int i=0;
+        for(Record record:tempResult){
+            temp[i]=record.getTempf();
+            cpuUsage[i]=record.getCpuUsagef();
+            diskUsage[i]=record.getDiskUsagef();
+            memoryUsage[i]=record.getMemoryUsagef();
+            receiveBW[i]=record.getReceiveBWf();
+            transmitBW[i]=record.getTransmitBWf();
+            i++;
+        }
+        JSONObject result=new JSONObject();
+        result.put("temp",temp);
+        result.put("cpuUsage",cpuUsage);
+        result.put("diskUsage",diskUsage);
+        result.put("memoryUsage",memoryUsage);
+        result.put("receiveBW",receiveBW);
+        result.put("transmitBW",transmitBW);
+        return result.toJSONString();
+
+
     }
 }

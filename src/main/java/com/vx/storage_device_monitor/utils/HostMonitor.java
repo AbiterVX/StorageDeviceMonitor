@@ -35,6 +35,11 @@ public class HostMonitor implements Runnable {
     List<HostInfo> hostInfoList;
     //采样间隔，默认为2s
     public int interval_ms;
+
+    public Thread getNewThread() {
+        return newThread;
+    }
+
     //线程
     private Thread newThread;
     //线程开始
@@ -47,7 +52,7 @@ public class HostMonitor implements Runnable {
     //---------Init
     public HostMonitor(){
         //延迟时间默认为2000，单位：ms
-        this(120000);
+        this(2000);
     }
 
     public boolean isDataHasBeenWritten() {
@@ -96,10 +101,12 @@ public class HostMonitor implements Runnable {
         String command = "cat /proc/net/dev";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
-
+            //System.out.println(commandResult.size());
             for(int j=0;j<commandResult.size();j++){
                 String currentLine = commandResult.get(j);
+                //System.out.println(currentLine);
                 if(currentLine.contains("eth0")){
+
                     String[] datas = currentLine.split("\\s+");
                     //数据设置
                     HostInfo currentHostInfo = hostInfoList.get(i);
@@ -107,6 +114,8 @@ public class HostMonitor implements Runnable {
                     currentHostInfo.transmitBytes[0] = currentHostInfo.transmitBytes[1];
                     currentHostInfo.receiveBytes[1] = Integer.parseInt(datas[2]);
                     currentHostInfo.transmitBytes[1] = Integer.parseInt(datas[10]);
+                    System.out.println(currentHostInfo.receiveBytes);
+                    System.out.println(currentHostInfo.transmitBytes);
                     break;
                 }
             }
@@ -222,11 +231,11 @@ public class HostMonitor implements Runnable {
             //采样
             sampleAll();
             //获取
-            /*
+
             for(HostInfo hostInfo:hostInfoList){
                 System.out.println(hostInfo.getOutputData(interval_ms).toString());
             }
-            */
+
             //等待
             setDataHasBeenWritten(false);
             try {
@@ -267,13 +276,14 @@ public class HostMonitor implements Runnable {
     public static void main(String[] args) {
         HostMonitor hostMonitor = new HostMonitor();
         hostMonitor.start();
+        System.out.println(hostMonitor.getHostInfoListOutputData());
 
-        try {
-            Thread.sleep(10000);
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(30000);
+//        }
+//        catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         hostMonitor.stop();
     }
 

@@ -1,6 +1,7 @@
 package com.vx.storage_device_monitor.controller;
 
 
+import com.vx.storage_device_monitor.dao.entity.Record;
 import com.vx.storage_device_monitor.service.Service_Implementation;
 import com.vx.storage_device_monitor.utils.HostConfigInfo;
 import com.vx.storage_device_monitor.utils.HostMonitor;
@@ -77,6 +78,15 @@ public class MainController {
         System.out.println(result);
         return result;
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/getHostHardWareList", method = RequestMethod.POST)
+    public String postGetHostHardwareList(){
+        String result = service_implementation.getHostHardwareInfoListOutputData();
+        System.out.println(result);
+        return result;
+    }
+
 
 
 }

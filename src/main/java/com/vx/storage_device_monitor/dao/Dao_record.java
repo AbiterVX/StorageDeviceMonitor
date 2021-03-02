@@ -36,6 +36,10 @@ public interface Dao_record {
             "order by timestamp " )
     List<Record> recordQueryWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
 
+    @Select("select count(*) from NodeRecord " +
+            "where ip=#{ip} and timestamp > #{lowbound} and timestamp < #{highbound} " +
+            "order by timestamp ")
+    int recordNumberQueryWithTimestamp(@Param("lowbound")Timestamp lowbound, @Param("highbound") Timestamp highbound, @Param("ip") String ip);
     @Select("select receiveBW,transmitBW,timestamp from NodeRecord " +
             "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
             "order by timestamp")
@@ -89,6 +93,5 @@ public interface Dao_record {
             "where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound}" +
             "order by timestamp")
     List<IOrecord2> getOnumberWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
-
 
 }

@@ -37,4 +37,15 @@ public class TestController {
                 service_implementation.getSingleNewestInfoByIp("223.4.179.227");
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/test3",method = RequestMethod.GET)
+    public String test3(String ip){
+        return service_implementation.getFullRecordsByIP("39.105.123.116",2);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/test4",method = RequestMethod.GET)
+    public String test4(String ip){
+        return service_implementation.getHostHardwareInfoListOutputData();
+    }
 }
