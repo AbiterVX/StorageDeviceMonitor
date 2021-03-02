@@ -1,0 +1,21 @@
+package com.vx.storage_device_monitor.dao;
+
+import com.vx.storage_device_monitor.dao.entity.DiskFailureRecord;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+@Mapper
+public interface Dao_disk {
+    @Select("select * from DiskFailure where ip=#{ip} ")
+    List<DiskFailureRecord> getDiskFailureByIp(@Param("ip") String ip);
+
+    @Select("select * from DiskFailure where ip=#{ip} and timestamp>#{lowbound} and timestamp<#{highbound} order by timestamp")
+    List<DiskFailureRecord> getDiskFailureWithTimestamp(@Param("ip") String ip, @Param("lowbound")Timestamp lowbound,@Param("highbound")Timestamp highbound);
+
+
+
+}
