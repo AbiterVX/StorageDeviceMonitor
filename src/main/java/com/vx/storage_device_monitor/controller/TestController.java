@@ -46,6 +46,8 @@ public class TestController {
     @ResponseBody
     @RequestMapping(value = "/test4",method = RequestMethod.GET)
     public String test4(String ip){
-        return service_implementation.getHostHardwareInfoListOutputData();
+        String result=service_implementation.getDiskFailureList("192.168.0.0");
+        System.out.println(result);
+        return result;
     }
 }

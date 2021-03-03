@@ -2,11 +2,9 @@ package com.vx.storage_device_monitor.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.vx.storage_device_monitor.dao.Dao_disk;
 import com.vx.storage_device_monitor.dao.Dao_record;
-import com.vx.storage_device_monitor.dao.entity.BWrecord;
-import com.vx.storage_device_monitor.dao.entity.FieldType;
-import com.vx.storage_device_monitor.dao.entity.IOrecord;
-import com.vx.storage_device_monitor.dao.entity.Record;
+import com.vx.storage_device_monitor.dao.entity.*;
 import com.vx.storage_device_monitor.utils.HostMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -15,6 +13,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +23,8 @@ import java.util.Map;
 public class Service_Implementation implements Service_Interface, ApplicationRunner {
     @Autowired
     private Dao_record dao_record;
+    @Autowired
+    private Dao_disk dao_disk;
     private HostMonitor hostMonitor=new HostMonitor();
     private Thread pThread=null;
     @Override
@@ -72,6 +74,8 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     private void startMonitor() {
         hostMonitor.start();
     }
+
+
     private class PersistenceThread implements Runnable{
 
         private int interval_ms;
@@ -196,7 +200,33 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         result.put("receiveBW",receiveBW);
         result.put("transmitBW",transmitBW);
         return result.toJSONString();
+    }
 
+
+    public String getDiskFailureList(String ip) {
+        List<String> timestampList=dao_disk.getDiskFailureTimestamp(ip);
+        String resultDate=findLatest(timestampList);
+        List<String> diskFailureInfo=dao_disk.getDiskFailureInfo(ip,resultDate);
+        StringBuffer temp=new StringBuffer("");
+        for(String string:diskFailureInfo){
+            temp.append(string);
+            temp.append("\n");
+        }
+        JSONObject resultObject=new JSONObject();
+        resultObject.put("ip",ip);
+        resultObject.put("date",resultDate);
+        resultObject.put("Information",temp.toString());
+        return resultObject.toJSONString();
+    }
+
+    private String findLatest(List<String> timestampList) {
+        ArrayList<DateParser> list=new ArrayList<>();
+        for(String string:timestampList){
+            list.add(new DateParser(string));
+        }
+        Collections.sort(list);
+        return list.get(list.size()-1).getOriginalFormat();
 
     }
+
 }

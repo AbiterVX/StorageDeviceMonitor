@@ -87,6 +87,21 @@ public class MainController {
         return result;
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/getRecentHostInfoList", method = RequestMethod.POST)
+    public String postGetRecentHostInfoList(){
+        String result = service_implementation.getFullRecordsByIP("39.105.123.116",2);
+        System.out.println(result);
+        return result;
+    }
+    @ResponseBody
+    @RequestMapping(value="/getDiskFailureList", method=RequestMethod.POST)
+    public String postGetDiskFailure(){
+        String result=service_implementation.getDiskFailureList("192.168.0.0");
+        System.out.println(result);
+        return result;
+    }
+
 
 
 }
