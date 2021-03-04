@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
     <meta charset="UTF-8">
     <title>Storage Device Monitor</title>
     <!-- JQuery -->
@@ -60,14 +59,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" style="color:black;font-weight:bold;" href="CheckHostInfo">
+                            <a class="nav-link"  href="CheckHostInfo">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                                 资源利用
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="CheckHostInfoComparison">
+                            <a class="nav-link" style="color:black;font-weight:bold;" href="CheckHostInfoComparison">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                                 资源利用对比
                             </a>
@@ -97,46 +96,35 @@
             </nav>
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-                <!-- -->
 
+
+
+                <!-- 标题-->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">存储设备资源使用状况</h2>
+                    <h2 class="h2">资源利用对比</h2>
+
                     <div class="btn-toolbar mb-2 mb-md-0">
-                        <!--
-                        <div class="btn-group mr-2">
-                            <button class="btn btn-sm btn-outline-secondary">Share</button>
-                            <button class="btn btn-sm btn-outline-secondary">Export</button>
-                        </div>-->
+                        <!-- 类型下拉菜单-->
+                        <div style="margin-right: 20px;">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="TypeDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                --
+                            </button>
+                            <div id="TypeDropDownMenu" class="dropdown-menu" aria-labelledby="TypeDropDownBtn">
+                                <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                            </div>
+                        </div>
+
+                        <!-- IP下拉菜单-->
                         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             0.0.0.0
                         </button>
                         <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
-                            <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                            <a class="dropdown-item" href="#" onclick="FSelectType(0)"> 0.0.0.0</a>
                         </div>
                     </div>
                 </div>
-
-
-                <!-- 利用率标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">利用率</h2>
-                </div>
-                <!-- 利用率图表-->
-                <div id="UsageChart" style="width: 100%;height: 350px;"></div>
-
-                <!-- 温度标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">温度</h2>
-                </div>
-                <!-- 温度图表-->
-                <div id="TemperatureChart" style="width: 100%;height: 350px;"></div>
-
-                <!-- 网络带宽标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">网络带宽</h2>
-                </div>
-                <!-- 网络带宽图表-->
-                <div id="NetBindWidthChart" style="width: 100%;height: 350px;"></div>
+                <!-- 图表-->
+                <div id="UsageComparisonChart" style="width: 100%;height: 350px;"></div>
             </main>
         </div>
     </div>
@@ -145,106 +133,83 @@
 <script >
     //下拉菜单-当前选择的host index
     var currentHostIpIndex = 0;
-
-    //-----利用率表
-    //利用率
-    var usageChart = echarts.init(document.getElementById("UsageChart"));
-    //温度
-    var temperatureChart = echarts.init(document.getElementById("TemperatureChart"));
-    //网络带宽
-    var netBindWidthChart = echarts.init(document.getElementById("NetBindWidthChart"));
-    //-----利用率数据
-    //CPU
-    var usageData = [ [],[], []  ];
-    //内存
-    var temperatureData = [ [] ];
-    //网络带宽
-    var netBindWidthData = [ [], [] ];
-
+    //类型下拉菜单按钮
+    var typeDropdownBtn = document.getElementById("TypeDropDownBtn");
+    //类型下拉菜单-当前选择的类型 index
+    var currentTypeIndex = 0;
+    //利用率表
+    var usageComparisonChart = echarts.init(document.getElementById("UsageComparisonChart"));
+    //利用率数据
+    var usageComparisonData = [];
+    //类型下拉菜单Label
+    var TypeDropdownBtnLabel = ["CPU利用率","内存利用率","磁盘利用率","温度","网络接收数据","网络发送数据"];
+    var typeKey = ["cpuUsage","memoryUsage","diskUsage","temp","receiveBW","transmitBW"];
     //页面加载完成后执行
     window.onload=function (){
         //设置主机IP列表
         FSetHostIpList("HostIpList");
         //设置下拉菜单
         FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
+        //init类型下拉菜单/按钮
 
-        //-----初始化利用率表格
-        FInitTable(usageChart,usageData,["CPU","内存","磁盘"],"%");
-        FInitTable(temperatureChart,temperatureData,["温度"],"℃");
-        FInitTable(netBindWidthChart,netBindWidthData,["数据接受","数据发送"],"Kb/s");
+        var typeDropDownMenu = document.getElementById("TypeDropDownMenu");
+        var typeDropDownMenuHtml = ""
+        for(var i=0;i<TypeDropdownBtnLabel.length;i++){
+            typeDropDownMenuHtml +=
+                "<a class=\"dropdown-item\" href=\"#\" onclick=\"FSelectType('"+ i +")\">" + TypeDropdownBtnLabel[i] +"</a>";
+        }
+        typeDropDownMenu.innerHTML = typeDropDownMenuHtml;
 
-        //刷新数据
-        FRefreshHostInfoList();
+        //默认：选择第一个type
+        FSelectType(currentTypeIndex);
     }
 
+    //左侧导航栏的ip按钮
     function FGetHostInfo(currentHostIp){
         //alert(currentHostIp)
     }
 
-    //获取某一时段主机信息
-    function FGetRecentHostInfoList(hostIndex) {
-        var parameterData = '{"index": ' + hostIndex+'}';
-        var jsonData = null;
-        $.ajax({
-            type:"post",
-            dataType:"json",
-            url:"/getRecentHostInfoList",
-            data:parameterData,
-            processData :false,
-            contentType:"application/json",
-            async:false,
-            success:function (resultJsonData) {
-                jsonData = resultJsonData;
-            },
-            error: function (err) {
-            }
-        });
-        return jsonData;
+    //类型下拉菜单-选择类型
+    function FSelectType(index){
+        typeDropdownBtn.innerText = TypeDropdownBtnLabel[index];
+        currentTypeIndex = index;
+
+        //重置图表数据
+        resetData();
+        //刷新图表数据数据
+        FRefreshHostTypeInfo();
+        //初始化图表
+        FRefreshTable(usageComparisonChart,usageComparisonData,FGetHostIpList(),FGetUnitLabel(),TypeDropdownBtnLabel[index]);
+
     }
-    //时间戳转换
-    function FGetDateTime(currentDate){
-        //时间转换
-        var date = new Date(currentDate);
-        var y = date.getFullYear();
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        var h = date.getHours();
-        var min = date.getMinutes();
-        var s = date.getSeconds();
-        var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
-        //dateString = date.format("yyyy/MM/dd hh:mm:ss");
-        return dateString;
-    }
-    //获取主机信息
-    function FRefreshHostInfoList() {
-        var jsonData = FGetRecentHostInfoList(currentHostIpIndex);
-        if(jsonData != null){
-            //添加数据
 
-            for(var i=0;i<jsonData["timestamp"].length;i++){
-                var dateString = FGetDateTime(jsonData["timestamp"][i]);
-
-                //利用率
-                usageData[0].push([  dateString,jsonData["cpuUsage"][i]  ]);
-                usageData[1].push([  dateString,jsonData["memoryUsage"][i]  ]);
-                usageData[2].push([  dateString,jsonData["diskUsage"][i]  ]);
-                //温度
-                temperatureData[0].push([  dateString,jsonData["temp"][i]  ]);
-                //网络带宽
-                netBindWidthData[0].push([  dateString,jsonData["receiveBW"][i]  ]);
-                netBindWidthData[1].push([  dateString,jsonData["transmitBW"][i]  ]);
-            }
-
-            //插入信息数据与更新表格
-            FRefreshChart(usageChart,usageData,currentHostIpIndex);
-            FRefreshChart(temperatureChart,temperatureData,currentHostIpIndex);
-            FRefreshChart(netBindWidthChart,netBindWidthData,currentHostIpIndex);
+    //获取单位
+    function FGetUnitLabel(typeIndex){
+        if(typeIndex <= 2){
+            return "%";
+        }
+        else if(  typeIndex === 3){
+            return "℃";
+        }
+        else{
+            return "Kb/s";
         }
     }
 
+    //重置图表数据
+    function resetData(){
+        var hostIpList = FGetHostIpList();
+        usageComparisonData = [];
+        for(var i=0;i<hostIpList.length;i++){
+            usageComparisonData.push([]);
+        }
+    }
     //初始化图表
-    function FInitTable(currentChart,currentData,seriesName,unitLabel){
+    function FRefreshTable(currentChart,currentData,seriesName,unitLabel,titleTxt){
         var option = {
+            title: {
+                text: titleTxt
+            },
             grid: {
                 left: '2%',
                 right: '2%',
@@ -310,10 +275,9 @@
             option["yAxis"]["min"] = 0;
             option["yAxis"]["interval"] = 20;
         }
+
         //series
-
         option["series"] = [];
-
         for(var i=0;i<seriesName.length;i++){
             option["series"].push({
                 name: seriesName[i],
@@ -327,6 +291,59 @@
         if (option && typeof option === 'object') {
             currentChart.setOption(option);
         }
+    }
+    //时间戳转换
+    function FGetDateTime(currentDate){
+        //时间转换
+        var date = new Date(currentDate);
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        var d = date.getDate();
+        var h = date.getHours();
+        var min = date.getMinutes();
+        var s = date.getSeconds();
+        var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
+        //dateString = date.format("yyyy/MM/dd hh:mm:ss");
+        return dateString;
+    }
+
+    //获取某一时段某一类型主机信息
+    function FGetRecentHostTypeInfoList(hostIndex,type) {
+        var parameterData = '{"index": ' + hostIndex+'}';
+        var jsonData = null;
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/getRecentHostInfoList",
+            data:parameterData,
+            processData :false,
+            contentType:"application/json",
+            async:false,
+            success:function (resultJsonData) {
+                jsonData = resultJsonData;
+            },
+            error: function (err) {
+            }
+        });
+        return jsonData;
+    }
+
+    //获取主机某一类型信息
+    function FRefreshHostTypeInfo() {
+        for(var i=0;i<usageComparisonData.length;i++){
+            var jsonData = FGetRecentHostTypeInfoList(currentHostIpIndex,typeKey[currentTypeIndex]);
+            if(jsonData!=null){
+                for(var j=0;j<jsonData.length;j++){
+                    var dateString = FGetDateTime(jsonData["timestamp"][j]);
+                    usageComparisonData[i].push([dateString, jsonData["data"][j]]);
+                }
+            }
+            else{
+                return;
+            }
+        }
+        //插入信息数据与更新表格
+        FRefreshChart(usageComparisonChart, usageComparisonData, currentHostIpIndex);
     }
 
     //刷新表格
@@ -354,8 +371,10 @@
         //网络带宽
         netBindWidthData = [ [], [] ];
 
-        //刷新数据
-        FRefreshHostInfoList();
+        FClearChart(usageData,usageChart);
+        FClearChart(temperatureData,temperatureChart);
+        FClearChart(netBindWidthData,netBindWidthChart);
+
     }
 
 </script>

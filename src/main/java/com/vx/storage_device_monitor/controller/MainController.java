@@ -61,6 +61,7 @@ public class MainController {
         return "html/Test.html";
     }
 
+    }
     //主机数据获取
     @ResponseBody
     @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)

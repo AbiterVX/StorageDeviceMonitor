@@ -52,16 +52,28 @@ public class HostInfo {
     //[磁盘]输入/输出操作花费的时间
     public int[] ioTimeSpent;
 
-
-    //CPU使用率
-    //内存使用率
-    //硬盘使用率
-    //带宽,单位k
-    //温度
-    //IO数量
-    //计算能力-CPU型号
+    //CPU温度
+    public float cpuTemperature;
     //能耗
-    //磁盘故障信息
+    public float energyConsumption;
+    //IO数量
+    public int[] ioNum;
+
+    //----------硬件型号
+    //CPU型号
+    public String cpuType;
+    //内存型号
+    public String memoryType;
+    //磁盘型号
+    public String diskType;
+    //操作系统型号
+    public String osType;
+    //网络带宽
+    public String netBindwidth;
+
+    //
+
+
 
     //[网络]带宽（格式KB/s）
     public float[] getNetBindWidth(){

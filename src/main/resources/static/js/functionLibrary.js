@@ -21,8 +21,12 @@ function FSetHostIpList(hostIpList_htmlId){
             HostIpListHtml +=
                 '<li class="nav-item">' +
                 '   <a class="nav-link" href="#" ' +
-                '       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>' +
-                jsonData[i] +
+                '       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">' +
+                '           <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>' +
+                '           <polyline points="2 17 12 22 22 17"></polyline>' +
+                '           <polyline points="2 12 12 17 22 12"></polyline>' +
+                '       </svg>' +
+                        jsonData[i] +
                 '   </a>' +
                 '</li>'
         }
@@ -80,8 +84,10 @@ function FGetHostIpList(){
 
     return jsonData;
 }
+
 //[定时更新]获取主机信息
 function FGetHostInfoList() {
+
     var jsonData = null;
     $.ajax({
         type:"post",
@@ -98,6 +104,9 @@ function FGetHostInfoList() {
     });
     return jsonData;
 }
+
+
+
 
 //获取host硬件信息
 function FGetHostHardWareInfoList(){
@@ -124,3 +133,4 @@ function FGetHostHardWareInfoList(){
     }
     return jsonData;
 }
+
