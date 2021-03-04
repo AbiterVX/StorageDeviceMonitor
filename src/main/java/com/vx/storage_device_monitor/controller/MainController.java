@@ -103,7 +103,13 @@ public class MainController {
         System.out.println(result);
         return result;
     }
-
+    @ResponseBody
+    @RequestMapping(value="/getAllCpuUsage",method=RequestMethod.POST)
+    public String postGetAllDeviceCpuUsage(@RequestBody Map<String,String> map){
+        String result=service_implementation.getAllDeviceCpuUsage(2);
+        System.out.println(result);
+        return result;
+    }
 
 
 }

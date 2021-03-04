@@ -78,6 +78,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return hostMonitor.getHostIp(index);
     }
 
+
     private class PersistenceThread implements Runnable{
 
         private int interval_ms;
@@ -184,6 +185,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         Float[] memoryUsage=new Float[numberOfEntry];
         Float[] receiveBW=new Float[numberOfEntry];
         Float[] transmitBW=new Float[numberOfEntry];
+        Timestamp[] timestamp=new Timestamp[numberOfEntry];
         int i=0;
         for(Record record:tempResult){
             temp[i]=record.getTempf();
@@ -192,6 +194,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
             memoryUsage[i]=record.getMemoryUsagef();
             receiveBW[i]=record.getReceiveBWf();
             transmitBW[i]=record.getTransmitBWf();
+            timestamp[i]=record.getTimestamp();
             i++;
         }
         JSONObject result=new JSONObject();
@@ -201,6 +204,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         result.put("memoryUsage",memoryUsage);
         result.put("receiveBW",receiveBW);
         result.put("transmitBW",transmitBW);
+        result.put("timestamp",timestamp);
         return result.toJSONString();
     }
 
@@ -229,6 +233,40 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         Collections.sort(list);
         return list.get(list.size()-1).getOriginalFormat();
 
+    }
+
+
+    public String getAllDeviceCpuUsage(int numberOfDays) {
+        //for(String ipitem:hostMonitor.getHostIpList()et)
+
+        int numberOfEntry= dao_record.allRecordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                new Timestamp(System.currentTimeMillis()));
+        List<Record> tempResult=dao_record.allCpuUsageQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                new Timestamp(System.currentTimeMillis()));
+        Float[] temp=new Float[numberOfEntry];
+        Float[] cpuUsage=new Float[numberOfEntry];
+        Float[] diskUsage=new Float[numberOfEntry];
+        Float[] memoryUsage=new Float[numberOfEntry];
+        Float[] receiveBW=new Float[numberOfEntry];
+        Float[] transmitBW=new Float[numberOfEntry];
+        int i=0;
+        for(Record record:tempResult){
+            temp[i]=record.getTempf();
+            cpuUsage[i]=record.getCpuUsagef();
+            diskUsage[i]=record.getDiskUsagef();
+            memoryUsage[i]=record.getMemoryUsagef();
+            receiveBW[i]=record.getReceiveBWf();
+            transmitBW[i]=record.getTransmitBWf();
+            i++;
+        }
+        JSONObject result=new JSONObject();
+        result.put("temp",temp);
+        result.put("cpuUsage",cpuUsage);
+        result.put("diskUsage",diskUsage);
+        result.put("memoryUsage",memoryUsage);
+        result.put("receiveBW",receiveBW);
+        result.put("transmitBW",transmitBW);
+        return result.toJSONString();
     }
 
 }

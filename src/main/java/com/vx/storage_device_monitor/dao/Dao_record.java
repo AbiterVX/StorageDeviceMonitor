@@ -94,4 +94,11 @@ public interface Dao_record {
             "order by timestamp")
     List<IOrecord2> getOnumberWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound,@Param("ip") String ip);
 
+    @Select("select count(*) from NodeRecord " +
+            "where timestamp > #{lowbound} and timestamp < #{highbound} " +
+            "order by timestamp ")
+    int allRecordNumberQueryWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound);
+
+    @Select("select * from NodeRecord where timestamp > #{lowbound} and timestamp < #{highbound} ")
+    List<Record> allCpuUsageQueryWithTimestamp(@Param("lowbound")Timestamp lowbound,@Param("highbound") Timestamp highbound);
 }
