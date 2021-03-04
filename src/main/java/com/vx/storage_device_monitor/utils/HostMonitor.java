@@ -101,10 +101,8 @@ public class HostMonitor implements Runnable {
         String command = "cat /proc/net/dev";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
-            //System.out.println(commandResult.size());
             for(int j=0;j<commandResult.size();j++){
                 String currentLine = commandResult.get(j);
-                //System.out.println(currentLine);
                 if(currentLine.contains("eth0")){
 
                     String[] datas = currentLine.split("\\s+");
@@ -114,8 +112,7 @@ public class HostMonitor implements Runnable {
                     currentHostInfo.transmitBytes[0] = currentHostInfo.transmitBytes[1];
                     currentHostInfo.receiveBytes[1] = Integer.parseInt(datas[2]);
                     currentHostInfo.transmitBytes[1] = Integer.parseInt(datas[10]);
-                    System.out.println(currentHostInfo.receiveBytes);
-                    System.out.println(currentHostInfo.transmitBytes);
+                    System.out.println("In function sampleNetBinWidth of HostMonitor"+currentHostInfo.receiveBytes);
                     break;
                 }
             }
@@ -186,7 +183,9 @@ public class HostMonitor implements Runnable {
         }
         return jsonArray.toJSONString();
     }
-
+    public String getHostIp(int index){
+        return hostConfigInfoList.get(index).ip;
+    }
     public Map<String, Object> getHostHardWareInfo(String ip){
         Map<String, Object> result = new HashMap<>();
         result.put("CPU",ip);
@@ -227,13 +226,14 @@ public class HostMonitor implements Runnable {
     @Override
     public void run() {
         while(threadStart){
-            while(!isDataHasBeenWritten)
+            System.out.println("Check:"+isDataHasBeenWritten);
+            while(!isDataHasBeenWritten);
             //采样
             sampleAll();
             //获取
 
             for(HostInfo hostInfo:hostInfoList){
-                System.out.println(hostInfo.getOutputData(interval_ms).toString());
+                System.out.println("In function run() of HostMonitor"+hostInfo.getOutputData(interval_ms).toString());
             }
 
             //等待

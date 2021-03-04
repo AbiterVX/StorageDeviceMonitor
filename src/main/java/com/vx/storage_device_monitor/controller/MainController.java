@@ -91,14 +91,15 @@ public class MainController {
     @RequestMapping(value = "/getRecentHostInfoList", method = RequestMethod.POST)
     public String postGetRecentHostInfoList(@RequestBody Map<String,String> map){
         int index=Integer.parseInt(map.get("index"));
-        String result = service_implementation.getFullRecordsByIP("39.105.123.116",2);
+        String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIp(index),2);
         System.out.println(result);
         return result;
     }
     @ResponseBody
     @RequestMapping(value="/getDiskFailureList", method=RequestMethod.POST)
-    public String postGetDiskFailure(){
-        String result=service_implementation.getDiskFailureList("192.168.0.0");
+    public String postGetDiskFailure(@RequestBody Map<String,String> map){
+        int index=Integer.parseInt(map.get("index"));
+        String result=service_implementation.getDiskFailureList(service_implementation.getHostIp(index));
         System.out.println(result);
         return result;
     }

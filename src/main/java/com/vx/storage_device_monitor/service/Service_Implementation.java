@@ -74,7 +74,9 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     private void startMonitor() {
         hostMonitor.start();
     }
-
+    public String getHostIp(int index){
+        return hostMonitor.getHostIp(index);
+    }
 
     private class PersistenceThread implements Runnable{
 
