@@ -88,20 +88,27 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         }
         @Override
         public void run() {
-            while(hostMonitor.threadStart){
+            int count=0;
+            while(hostMonitor.threadStart) {
 //                try {
 //                    Thread.sleep(2000);
 //                } catch (InterruptedException e) {
 //                    e.printStackTrace();
 //                }
                 //采样
-                while(hostMonitor.isDataHasBeenWritten());
-                List<Map<String,Object>> listForWritten=hostMonitor.getOriginalHostInfoListOutputData();
-                for(Map<String,Object> iterable:listForWritten){
-                    dao_record.insertNewRecord((String)iterable.get("ip"),(Timestamp) iterable.get("timestamp"),(float)iterable.get("receiveBW"),(float)iterable.get("transmitBW"),
-                            (float)iterable.get("cpuUsage"), (float)iterable.get("memoryUsage"),(float)iterable.get("diskUsage"),250,250,36.0f,600.0f);
+                while (hostMonitor.isDataHasBeenWritten()) ;
+                count++;
+                if (count % 12 == 11) {
+                    System.out.println("In the function run() of persistanceThread: "+count);
+                    List<Map<String, Object>> listForWritten = hostMonitor.getOriginalHostInfoListOutputData();
+                    for (Map<String, Object> iterable : listForWritten) {
+                        dao_record.insertNewRecord((String) iterable.get("ip"), (Timestamp) iterable.get("timestamp"), (float) iterable.get("receiveBW"), (float) iterable.get("transmitBW"),
+                                (float) iterable.get("cpuUsage"), (float) iterable.get("memoryUsage"), (float) iterable.get("diskUsage"), 250, 250, 36.0f, 600.0f);
+                    }
+                    count=0;
                 }
                 //等待
+
                 hostMonitor.setDataHasBeenWritten(true);
                 try {
                     Thread.sleep(interval_ms);
@@ -219,11 +226,13 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
             temp.append(string);
             temp.append("\n");
         }
-        JSONObject resultObject=new JSONObject();
-        resultObject.put("ip",ip);
-        resultObject.put("date",resultDate);
-        resultObject.put("Information",temp.toString());
-        return resultObject.toJSONString();
+        JSONArray result=new JSONArray();
+        JSONObject jObject=new JSONObject();
+        jObject.put("date",resultDate);
+        jObject.put("type","未知");
+        jObject.put("information",temp.toString());
+        result.add(jObject);
+        return result.toJSONString();
     }
 
     private String findLatest(List<String> timestampList) {

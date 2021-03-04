@@ -52,7 +52,7 @@ public class HostMonitor implements Runnable {
     //---------Init
     public HostMonitor(){
         //延迟时间默认为2000，单位：ms
-        this(2000);
+        this(10000);
     }
 
     public boolean isDataHasBeenWritten() {
