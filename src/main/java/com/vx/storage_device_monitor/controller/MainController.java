@@ -89,8 +89,9 @@ public class MainController {
 
     @ResponseBody
     @RequestMapping(value = "/getRecentHostInfoList", method = RequestMethod.POST)
-    public String postGetRecentHostInfoList(){
-        String result = service_implementation.getFullRecordsByIP("39.105.123.116",2);
+    public String postGetRecentHostInfoList(@RequestBody Map<String,String> map){
+        int index=Integer.parseInt(map.get("index"));
+        //String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIpList()[index],2);
         System.out.println(result);
         return result;
     }
