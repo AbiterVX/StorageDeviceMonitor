@@ -56,12 +56,17 @@ public class MainController {
 
 
     //测试界面
-    @RequestMapping(value ="Test", method = RequestMethod.GET)
+    @RequestMapping(value ="/Test", method = RequestMethod.GET)
     public String Test(){
         return "html/Test.html";
     }
 
+    //资源利用率对比界面
+    @RequestMapping(value ="/CheckHostInfoComparison", method = RequestMethod.GET)
+    public String getCheckHostInfoComparison(){
+        return "html/CheckHostInfoComparison.html";
     }
+
     //主机数据获取
     @ResponseBody
     @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)
@@ -93,7 +98,6 @@ public class MainController {
     public String postGetRecentHostInfoList(@RequestBody Map<String,String> map){
         int index=Integer.parseInt(map.get("index"));
         String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIp(index),2);
-        System.out.println(result);
         return result;
     }
     @ResponseBody
