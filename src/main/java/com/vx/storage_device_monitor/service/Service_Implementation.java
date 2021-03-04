@@ -1,6 +1,7 @@
 package com.vx.storage_device_monitor.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.vx.storage_device_monitor.dao.Dao_disk;
 import com.vx.storage_device_monitor.dao.Dao_record;
@@ -237,35 +238,42 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
 
 
     public String getAllDeviceCpuUsage(int numberOfDays) {
-        //for(String ipitem:hostMonitor.getHostIpList()et)
-
-        int numberOfEntry= dao_record.allRecordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
-                new Timestamp(System.currentTimeMillis()));
-        List<Record> tempResult=dao_record.allCpuUsageQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
-                new Timestamp(System.currentTimeMillis()));
-        Float[] temp=new Float[numberOfEntry];
-        Float[] cpuUsage=new Float[numberOfEntry];
-        Float[] diskUsage=new Float[numberOfEntry];
-        Float[] memoryUsage=new Float[numberOfEntry];
-        Float[] receiveBW=new Float[numberOfEntry];
-        Float[] transmitBW=new Float[numberOfEntry];
-        int i=0;
-        for(Record record:tempResult){
-            temp[i]=record.getTempf();
-            cpuUsage[i]=record.getCpuUsagef();
-            diskUsage[i]=record.getDiskUsagef();
-            memoryUsage[i]=record.getMemoryUsagef();
-            receiveBW[i]=record.getReceiveBWf();
-            transmitBW[i]=record.getTransmitBWf();
-            i++;
+        JSONArray jsonArray=JSON.parseArray(getHostIpList());
+        JSONArray result=new JSONArray();
+        for(Object object:jsonArray.stream().toArray()){
+            JSONObject tempObject=new JSONObject();
+            tempObject.put("ip",(String)object);
+            int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                    new Timestamp(System.currentTimeMillis()),(String)object);
+            List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                    new Timestamp(System.currentTimeMillis()),(String)object);
+            Float[] temp=new Float[numberOfEntry];
+            Float[] cpuUsage=new Float[numberOfEntry];
+            Float[] diskUsage=new Float[numberOfEntry];
+            Float[] memoryUsage=new Float[numberOfEntry];
+            Float[] receiveBW=new Float[numberOfEntry];
+            Float[] transmitBW=new Float[numberOfEntry];
+            Timestamp[] timestamp=new Timestamp[numberOfEntry];
+            int i=0;
+            for(Record record:tempResult){
+                temp[i]=record.getTempf();
+                cpuUsage[i]=record.getCpuUsagef();
+                diskUsage[i]=record.getDiskUsagef();
+                memoryUsage[i]=record.getMemoryUsagef();
+                receiveBW[i]=record.getReceiveBWf();
+                transmitBW[i]=record.getTransmitBWf();
+                timestamp[i]=record.getTimestamp();
+                i++;
+            }
+            tempObject.put("temp",temp);
+            tempObject.put("cpuUsage",cpuUsage);
+            tempObject.put("diskUsage",diskUsage);
+            tempObject.put("memoryUsage",memoryUsage);
+            tempObject.put("receiveBW",receiveBW);
+            tempObject.put("transmitBW",transmitBW);
+            tempObject.put("timestamp",timestamp);
+            result.add(tempObject);
         }
-        JSONObject result=new JSONObject();
-        result.put("temp",temp);
-        result.put("cpuUsage",cpuUsage);
-        result.put("diskUsage",diskUsage);
-        result.put("memoryUsage",memoryUsage);
-        result.put("receiveBW",receiveBW);
-        result.put("transmitBW",transmitBW);
         return result.toJSONString();
     }
 

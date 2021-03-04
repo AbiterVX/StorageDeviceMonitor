@@ -104,7 +104,7 @@ public class MainController {
         return result;
     }
     @ResponseBody
-    @RequestMapping(value="/getAllCpuUsage",method=RequestMethod.POST)
+    @RequestMapping(value="/getAllDeviceInfo",method=RequestMethod.POST)
     public String postGetAllDeviceCpuUsage(@RequestBody Map<String,String> map){
         String result=service_implementation.getAllDeviceCpuUsage(2);
         System.out.println(result);
