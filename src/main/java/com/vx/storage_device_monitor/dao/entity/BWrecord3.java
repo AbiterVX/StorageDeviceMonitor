@@ -3,30 +3,30 @@ package com.vx.storage_device_monitor.dao.entity;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class BWrecord2 {
-    private BigDecimal transmitBW;
+public class BWrecord3 {
+    private BigDecimal receiveBW;
     private Timestamp timestamp;
-    private float transmitBWf;
+    private float receiveBWf;
 
-    public BWrecord2(BigDecimal BW, Timestamp timestamp) {
-        this.transmitBW = BW;
+    public BWrecord3(BigDecimal BW, Timestamp timestamp) {
+        this.receiveBW = BW;
         this.timestamp = timestamp;
-        this.transmitBWf=BW.floatValue();
+        this.receiveBWf=BW.floatValue();
     }
 
     public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    public float getTransmitBWf() {
-        return transmitBWf;
+    public float getReceiveBWf() {
+        return receiveBWf;
     }
 
     @Override
     public String toString() {
-        return "BWrecord2{" +
+        return "BWrecord3{" +
                 "timestamp=" + timestamp +
-                ", transmitBW=" + transmitBWf +
+                ", receiveBW=" + receiveBWf +
                 '}';
     }
 }

@@ -2,17 +2,17 @@ package com.vx.storage_device_monitor.dao.entity;
 
 import java.sql.Timestamp;
 
-public class IOrecord2 {
-    private Integer iNumber;
+public class IOrecord3 {
+    private Integer oNumber;
     private Timestamp timestamp;
 
-    public IOrecord2(Integer number, Timestamp timestamp) {
-        this.iNumber = number;
+    public IOrecord3(Integer number, Timestamp timestamp) {
+        this.oNumber = number;
         this.timestamp = timestamp;
     }
 
-    public Integer getiNumber() {
-        return iNumber;
+    public Integer getoNumber() {
+        return oNumber;
     }
 
     public Timestamp getTimestamp() {
@@ -21,8 +21,8 @@ public class IOrecord2 {
 
     @Override
     public String toString() {
-        return "IOrecord2{" +
-                "number=" + iNumber +
+        return "IOrecord3{" +
+                "number=" + oNumber +
                 ", timestamp=" + timestamp +
                 '}';
     }

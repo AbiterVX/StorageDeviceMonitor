@@ -190,7 +190,12 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         for(int i=0;i<jsonArray.size();i++){
             JSONObject temp=jsonArray.getJSONObject(i);
             System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+temp.toJSONString());
-            fieldArray.add((BigDecimal)temp.get(fidldName+"f"));
+            if(!(fidldName.equals("iNumber")||fidldName.equals("oNumber"))) {
+                fieldArray.add((BigDecimal) temp.get(fidldName + "f"));
+            }
+            else{
+                fieldArray.add((Integer) temp.get(fidldName));
+            }
             timestampArray.add(temp.get("timestamp"));
         }
         resultObject.put(fidldName,fieldArray);
