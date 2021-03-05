@@ -2,6 +2,7 @@ package com.vx.storage_device_monitor.dao;
 
 
 import com.vx.storage_device_monitor.dao.entity.*;
+import com.vx.storage_device_monitor.dao.entity.Record;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

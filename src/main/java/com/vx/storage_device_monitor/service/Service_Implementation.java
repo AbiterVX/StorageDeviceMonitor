@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.vx.storage_device_monitor.dao.Dao_disk;
 import com.vx.storage_device_monitor.dao.Dao_record;
 import com.vx.storage_device_monitor.dao.entity.*;
+import com.vx.storage_device_monitor.dao.entity.Record;
 import com.vx.storage_device_monitor.utils.HostMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;

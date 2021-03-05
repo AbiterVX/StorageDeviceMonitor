@@ -168,7 +168,7 @@
                         <tr>
                             <th scope="col">名称</th>
                             <th scope="col">配置</th>
-                            <th scope="col">当前使用</th>
+                            <th scope="col">其他</th>
                         </tr>
                         </thead>
                         <tbody id ="HostHardWareInfoListTable">
@@ -212,10 +212,11 @@
         var jsonData = FGetHostHardWareInfoList();
         if(jsonData != null){
             var html = "";
+            html += '<tr><th scope="row">OS</th><td>'+ jsonData[currentHostIpIndex]["OS"]+'</td><td>--</td></tr>';
             html += '<tr><th scope="row">CPU</th><td>'+ jsonData[currentHostIpIndex]["CPU"]+'</td><td>--</td></tr>';
-            html += '<tr><th scope="row">Memory</th><td>'+ jsonData[currentHostIpIndex]["Memory"]+'</td><td>--</td></tr>';
+            html += '<tr><th scope="row">Memory</th><td>'+ jsonData[currentHostIpIndex]["Memory"]+'</td><td>' + jsonData[currentHostIpIndex]["MemorySize"]  +'</td></tr>';
             html += '<tr><th scope="row">Disk</th><td>'+ jsonData[currentHostIpIndex]["Disk"]+'</td><td>--</td></tr>';
-            html += '<tr><th scope="row">GPU</th><td>'+ jsonData[currentHostIpIndex]["GPU"]+'</td><td>--</td></tr>';
+
             hostHardWareInfoListTable.innerHTML = html;
         }
     }

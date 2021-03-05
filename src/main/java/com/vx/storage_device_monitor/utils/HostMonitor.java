@@ -205,24 +205,111 @@ public class HostMonitor implements Runnable {
     public String getHostIp(int index){
         return hostConfigInfoList.get(index).ip;
     }
-    public Map<String, Object> getHostHardWareInfo(String ip){
+    public Map<String, Object> getHostHardWareInfo(int index){
         Map<String, Object> result = new HashMap<>();
-        result.put("CPU",ip);
-        result.put("Memory",ip);
-        result.put("Disk",ip);
-        result.put("GPU",ip);
+        HostInfo hostInfo = hostInfoList.get(index);
+        result.put("CPU",hostInfo.cpuType);
+        result.put("Memory",hostInfo.memoryType);
+        result.put("Disk",hostInfo.diskType);
+        result.put("OS",hostInfo.osType);
+        result.put("MemorySize",hostInfo.memorySize);
         return result;
     }
     public String getHostHardWareInfoListOutputData(){
         JSONArray jsonArray = new JSONArray();
-        for(HostInfo hostInfo:hostInfoList){
-            Map<String, Object> result = getHostHardWareInfo(hostInfo.ip);
+        for(int i=0;i<hostInfoList.size();i++){
+            Map<String, Object> result = getHostHardWareInfo(i);
             JSONObject jsonObject = new JSONObject(result);
             jsonArray.add(jsonObject);
         }
 
         return jsonArray.toJSONString();
     }
+
+
+    //---------获得Host硬件设备信息
+    public void sampleHostHardWareInfo(){
+        getOSType();
+        getCpuType();
+        //getMemoryType();
+        getDiskType();
+        getMemorySize();
+    }
+    //获取操作系统类型
+    public void getOSType() {
+        String command = "head -n 1 /etc/issue";
+        for (int i = 0; i < hostConfigInfoList.size(); i++) {
+            List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                currentHostInfo.osType = commandResult.get(0);
+            }
+        }
+    }
+    //获取CPU类型
+    public void getCpuType() {
+        String command = "cat /proc/cpuinfo | grep \"model name\"";
+        for (int i = 0; i < hostConfigInfoList.size(); i++) {
+            List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                currentHostInfo.cpuType = commandResult.get(0).split(":")[1];
+            }
+        }
+    }
+    //获取内存类型
+    public void getMemoryType() {
+        String command = "grep MemTotal /proc/meminfo";
+        for (int i = 0; i < hostConfigInfoList.size(); i++) {
+            List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                currentHostInfo.cpuType = commandResult.get(0).split(":")[1];
+            }
+        }
+    }
+    //获取内存大小
+    public void getMemorySize() {
+        String command = "grep MemTotal /proc/meminfo";
+        for (int i = 0; i < hostConfigInfoList.size(); i++) {
+            List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                currentHostInfo.memorySize = commandResult.get(0).split(":")[1];
+            }
+        }
+    }
+    //获取磁盘类型
+    public void getDiskType() {
+        String command = "fdisk -l | grep \"Disk /dev\"   ";
+        for (int i = 0; i < hostConfigInfoList.size(); i++) {
+            List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                String diskInfoTxt = "";
+                for(int j=0;j<commandResult.size();j++){
+                    diskInfoTxt += commandResult.get(0) + "\n";
+                }
+                currentHostInfo.diskType = diskInfoTxt;
+            }
+        }
+    }
+
 
     //获取Host的IP
     public String getHostIpList(){
@@ -252,6 +339,9 @@ public class HostMonitor implements Runnable {
     //多线程运行
     @Override
     public void run() {
+        //硬件设备信息
+        sampleHostHardWareInfo();
+
         while(threadStart){
             System.out.println("Check:"+isDataHasBeenWritten);
             while(!isDataHasBeenWritten);

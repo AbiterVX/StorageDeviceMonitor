@@ -145,7 +145,10 @@
 <script >
     //下拉菜单-当前选择的host index
     var currentHostIpIndex = 0;
-
+    //更新HostState定时任务
+    var refreshHostState;
+    //更新间隔
+    var refreshInterval = 1000 * 5;
     //-----利用率表
     //利用率
     var usageChart = echarts.init(document.getElementById("UsageChart"));
@@ -165,6 +168,7 @@
     window.onload=function (){
         //设置主机IP列表
         FSetHostIpList("HostIpList");
+        refreshHostState = window.setInterval ('FSetHostIpList("HostIpList")',refreshInterval);
         //设置下拉菜单
         FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
 
@@ -269,9 +273,9 @@
                 },
                 axisLabel: {
                     formatter: {
-                        year: '{yyyy}',
-                        month: '{MM}',
-                        day: '{dd}',
+                        year: '{yyyy}年',
+                        month: '{MM}月',
+                        day: '{MM}月{dd}日',
                         hour: '{HH}:{mm}',
                         minute: '{HH}:{mm}',
                         second: '{HH}:{mm}:{ss}',

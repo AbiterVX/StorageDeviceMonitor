@@ -178,6 +178,11 @@
 </body>
 
 <script >
+    //更新HostState定时任务
+    var refreshHostState;
+    //更新间隔
+    var refreshInterval = 1000 * 5;
+
     //磁盘故障信息
     var diskFailureInfoList = document.getElementById("DiskFailureInfoList");
     //下拉菜单-当前选择的host index
@@ -190,6 +195,7 @@
 
         //设置主机IP列表
         FSetHostIpList("HostIpList");
+        refreshHostState = window.setInterval ('FSetHostIpList("HostIpList")',refreshInterval);
         //设置下拉菜单
         FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
         //设备配置信息

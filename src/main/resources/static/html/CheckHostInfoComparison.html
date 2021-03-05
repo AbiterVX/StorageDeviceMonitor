@@ -107,23 +107,13 @@
                     <div class="btn-toolbar mb-3" role="toolbar">
                         <div class="btn-toolbar mb-2 mb-md-0">
                             <!-- 类型下拉菜单-->
-                            <div style="margin-right: 20px;">
+                            <div style="margin-right: 0px;">
                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="TypeDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     --
                                 </button>
                                 <div id="TypeDropDownMenu" class="dropdown-menu" aria-labelledby="TypeDropDownBtn">
                                     <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <!-- IP下拉菜单-->
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                0.0.0.0
-                            </button>
-                            <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
-                                <a class="dropdown-item" href="#" onclick="FSelectType(0)"> 0.0.0.0</a>
                             </div>
                         </div>
                     </div>
@@ -137,12 +127,15 @@
 </body>
 
 <script >
-    //下拉菜单-当前选择的host index
-    var currentHostIpIndex = 0;
+    //更新HostState定时任务
+    var refreshHostState;
+    //更新间隔
+    var refreshInterval = 1000 * 5;
+
     //类型下拉菜单按钮
     var typeDropdownBtn = document.getElementById("TypeDropDownBtn");
     //类型下拉菜单-当前选择的类型 index
-    var currentTypeIndex = 0;
+    var currentTypeIndex = -1;
     //利用率表
     var usageComparisonChart = echarts.init(document.getElementById("UsageComparisonChart"));
     //利用率数据
@@ -154,10 +147,8 @@
     window.onload=function (){
         //设置主机IP列表
         FSetHostIpList("HostIpList");
-        //设置下拉菜单
-        FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
+        refreshHostState = window.setInterval ('FSetHostIpList("HostIpList")',refreshInterval);
         //init类型下拉菜单/按钮
-
         var typeDropDownMenu = document.getElementById("TypeDropDownMenu");
         var typeDropDownMenuHtml = ""
         for(var i=0;i<TypeDropdownBtnLabel.length;i++){
@@ -167,15 +158,13 @@
         typeDropDownMenu.innerHTML = typeDropDownMenuHtml;
 
         //默认：选择第一个type
-        FSelectType(currentTypeIndex);
+        FSelectType(0);
     }
 
     //左侧导航栏的ip按钮
     function FGetHostInfo(currentHostIp){
         //alert(currentHostIp)
     }
-
-
 
     //获取单位
     function FGetUnitLabel(typeIndex){
@@ -198,8 +187,11 @@
             usageComparisonData.push([]);
         }
     }
+
     //初始化图表
     function FInitTable(currentChart,currentData,seriesName,unitLabel,titleTxt){
+        usageComparisonChart.clear();
+        usageComparisonChart = echarts.init(document.getElementById("UsageComparisonChart"));
         var option = {
             title: {
                 text: titleTxt
@@ -228,9 +220,9 @@
                 },
                 axisLabel: {
                     formatter: {
-                        year: '{yyyy}',
-                        month: '{MM}',
-                        day: '{dd}',
+                        year: '{yyyy}年',
+                        month: '{MM}月',
+                        day: '{MM}月{dd}日',
                         hour: '{HH}:{mm}',
                         minute: '{HH}:{mm}',
                         second: '{HH}:{mm}:{ss}',
@@ -242,9 +234,6 @@
             yAxis: {
                 type: 'value',
                 boundaryGap: [0, '100%'],
-                /*max: 100,
-                min: 0,
-                interval:20,*/
                 splitLine: {
                     show: true
                 },
@@ -286,6 +275,7 @@
             currentChart.setOption(option);
         }
     }
+
     //时间戳转换
     function FGetDateTime(currentDate){
         //时间转换
@@ -303,12 +293,12 @@
 
     //获取某一时段某一类型主机信息
     function FGetRecentHostTypeInfoList(hostIndex,type) {
-        var parameterData = '{"index": ' + hostIndex+ 'type:"' + type +'"}';
+        var parameterData = '{"index": "'+ hostIndex +'","field":"' + type +'"}';
         var jsonData = null;
         $.ajax({
             type:"post",
             dataType:"json",
-            url:"/getRecentHostInfoList",
+            url:"/getFieldInfoList",
             data:parameterData,
             processData :false,
             contentType:"application/json",
@@ -325,33 +315,18 @@
     //获取主机某一类型信息
     function FRefreshHostTypeInfo() {
         for(var i=0;i<usageComparisonData.length;i++){
-            var jsonData = FGetRecentHostTypeInfoList(currentHostIpIndex,typeKey[currentTypeIndex]);
+            var jsonData = FGetRecentHostTypeInfoList(i,typeKey[currentTypeIndex]);
             if(jsonData!=null){
-                for(var j=0;j<jsonData.length;j++){
-                    var dateString = FGetDateTime(jsonData["timestamp"][j]);
-                    usageComparisonData[i].push([dateString, jsonData["data"][j]]);
+                for(var j=0;j<jsonData[0]["timestamp"].length;j++){
+                    var dateString = FGetDateTime(jsonData[0]["timestamp"][j]);
+                    usageComparisonData[i].push([dateString, jsonData[0][typeKey[currentTypeIndex]][j]]);
                 }
             }
             else{
                 return;
             }
         }
-        //插入信息数据与更新表格
-        FRefreshChart(usageComparisonChart, usageComparisonData, currentHostIpIndex);
     }
-    //刷新表格显示数据
-    function FRefreshChart(currentChart,currentData,newDataName){
-        var option = {
-            series: []
-        };
-        for(var i=0;i<currentData.length;i++){
-            option["series"].push({
-                data:currentData[i]
-            })
-        }
-        currentChart.setOption(option);
-    }
-
 
     //类型下拉菜单-选择类型
     function FSelectType(index){
@@ -362,19 +337,11 @@
             resetData();
             //刷新图表数据数据
             FRefreshHostTypeInfo();
-            //初始化图表
-            FInitTable(usageComparisonChart,usageComparisonData,FGetHostIpList(),FGetUnitLabel(),TypeDropdownBtnLabel[index]);
 
+            //初始化图表
+            FInitTable(usageComparisonChart,usageComparisonData,FGetHostIpList(),FGetUnitLabel(index),TypeDropdownBtnLabel[index]);
         }
     }
-
-    //下拉菜单选项回调
-    function FSelectBtnCallback(index){
-        //设置当前选中的索引
-        currentHostIpIndex = index;
-
-    }
-
 </script>
 
 

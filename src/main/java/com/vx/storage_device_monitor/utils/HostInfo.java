@@ -71,6 +71,8 @@ public class HostInfo {
     public String cpuType;
     //内存型号
     public String memoryType;
+    //内存大小
+    public String memorySize;
     //磁盘型号
     public String diskType;
     //操作系统型号
