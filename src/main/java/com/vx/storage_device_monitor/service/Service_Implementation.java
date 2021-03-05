@@ -101,7 +101,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                 while (hostMonitor.isDataHasBeenWritten()) ;
                 count++;
                 if (count % 12 == 11) {
-                    System.out.println("In the function run() of persistanceThread: "+count);
+                    //System.out.println("In the function run() of persistanceThread: "+count);
                     List<Map<String, Object>> listForWritten = hostMonitor.getOriginalHostInfoListOutputData();
                     for (Map<String, Object> iterable : listForWritten) {
                         dao_record.insertNewRecord((String) iterable.get("ip"), (Timestamp) iterable.get("timestamp"), (float) iterable.get("receiveBW"), (float) iterable.get("transmitBW"),
@@ -184,13 +184,13 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
         }
-        System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+result);
+        //System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+result);
         JSONArray jsonArray=JSONArray.parseArray(result);
         JSONArray fieldArray=new JSONArray();
         JSONArray timestampArray=new JSONArray();
         for(int i=0;i<jsonArray.size();i++){
             JSONObject temp=jsonArray.getJSONObject(i);
-            System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+temp.toJSONString());
+            //System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+temp.toJSONString());
             if(!(fidldName.equals("iNumber")||fidldName.equals("oNumber"))) {
                 fieldArray.add((BigDecimal) temp.get(fidldName + "f"));
             }

@@ -107,9 +107,9 @@ public class HostInfo {
         float cpuUsage = 0;
         if(cpuTotalTime[0] != 0 && cpuTotalTime[0] != cpuTotalTime[1]){
             cpuUsage = (1f-  (float) (cpuIdleTime[1] -cpuIdleTime[0]) / (float)(cpuTotalTime[1] - cpuTotalTime[0]) ) * 100f ;
+            System.out.println("IP: "+ip+" ,cpuUsage: "+cpuUsage + " %");
             cpuUsage=( float )(Math.round(cpuUsage* 100f ) / 100f );
         }
-        //System.out.println("IP: "+ip+" ,cpuUsage: "+cpuUsage + " %");
         return cpuUsage;
     }
     //[内存]利用率

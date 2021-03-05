@@ -120,7 +120,7 @@ public class HostMonitor implements Runnable {
                     currentHostInfo.transmitBytes[0] = currentHostInfo.transmitBytes[1];
                     currentHostInfo.receiveBytes[1] = Integer.parseInt(datas[2]);
                     currentHostInfo.transmitBytes[1] = Integer.parseInt(datas[10]);
-                    System.out.println("In function sampleNetBinWidth of HostMonitor"+currentHostInfo.receiveBytes);
+                    //System.out.println("In function sampleNetBinWidth of HostMonitor"+currentHostInfo.receiveBytes);
                     break;
                 }
             }
@@ -343,14 +343,14 @@ public class HostMonitor implements Runnable {
         sampleHostHardWareInfo();
 
         while(threadStart){
-            System.out.println("Check:"+isDataHasBeenWritten);
+            //System.out.println("Check:"+isDataHasBeenWritten);
             while(!isDataHasBeenWritten);
             //采样
             sampleAll();
             //获取
 
             for(HostInfo hostInfo:hostInfoList){
-                System.out.println("In function run() of HostMonitor"+hostInfo.getOutputData(interval_ms).toString());
+                //System.out.println("In function run() of HostMonitor"+hostInfo.getOutputData(interval_ms).toString());
             }
 
             //等待
@@ -395,7 +395,7 @@ public class HostMonitor implements Runnable {
     public static void main(String[] args) {
         HostMonitor hostMonitor = new HostMonitor();
         hostMonitor.start();
-        System.out.println(hostMonitor.getHostInfoListOutputData());
+        //System.out.println(hostMonitor.getHostInfoListOutputData());
 
 //        try {
 //            Thread.sleep(30000);
