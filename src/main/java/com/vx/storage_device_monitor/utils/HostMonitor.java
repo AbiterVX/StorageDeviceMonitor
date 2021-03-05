@@ -33,7 +33,7 @@ public class HostMonitor implements Runnable {
     List<HostConfigInfo> hostConfigInfoList;
     //Host系统信息
     List<HostInfo> hostInfoList;
-    //采样间隔，默认为2s
+    //采样间隔
     public int interval_ms;
 
     public Thread getNewThread() {
@@ -51,8 +51,8 @@ public class HostMonitor implements Runnable {
 
     //---------Init
     public HostMonitor(){
-        //延迟时间默认为2000，单位：ms
-        this(10000);
+        //延迟时间默认为10 * 1000，单位：ms
+        this(10 * 1000);
     }
 
     public boolean isDataHasBeenWritten() {
@@ -240,6 +240,14 @@ public class HostMonitor implements Runnable {
         }
         return mapList;
     }
+    //获取当前Host状态
+    public String getHostState(){
+        JSONArray jsonArray = new JSONArray();
+        for(HostInfo hostInfo:hostInfoList){
+            jsonArray.add(hostInfo.sessionConnected ? 1:0);
+        }
+        return jsonArray.toJSONString();
+    }
     //---------多线程执行
     //多线程运行
     @Override
@@ -291,6 +299,8 @@ public class HostMonitor implements Runnable {
             newThread = null;
         }
     }
+
+
     //main-用于测试
     public static void main(String[] args) {
         HostMonitor hostMonitor = new HostMonitor();

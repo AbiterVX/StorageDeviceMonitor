@@ -116,5 +116,11 @@ public class MainController {
         return result;
     }
 
-
+    @ResponseBody
+    @RequestMapping(value="/getHostState",method=RequestMethod.POST)
+    public String postGetHostState(){
+        String result=service_implementation.getHostState();
+        System.out.println(result);
+        return result;
+    }
 }
