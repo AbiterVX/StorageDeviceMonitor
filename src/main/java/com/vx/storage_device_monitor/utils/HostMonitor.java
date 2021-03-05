@@ -33,7 +33,7 @@ public class HostMonitor implements Runnable {
     List<HostConfigInfo> hostConfigInfoList;
     //Host系统信息
     List<HostInfo> hostInfoList;
-    //采样间隔，默认为2s
+    //采样间隔
     public int interval_ms;
 
     public Thread getNewThread() {
@@ -51,8 +51,8 @@ public class HostMonitor implements Runnable {
 
     //---------Init
     public HostMonitor(){
-        //延迟时间默认为2000，单位：ms
-        this(10000);
+        //延迟时间默认为10 * 1000，单位：ms
+        this(10 * 1000);
     }
 
     public boolean isDataHasBeenWritten() {
@@ -88,6 +88,12 @@ public class HostMonitor implements Runnable {
     public List<String> runCommand(String command, HostConfigInfo hostConfigInfo){
         return sshManager.runCommand(command,hostConfigInfo);
     }
+    //--------- 设置连接状态（如连接中断则保证其他主机也能正常连接）
+    public void setSessionConnected(int index,boolean _sessionConnected){
+        HostInfo currentHostInfo = hostInfoList.get(index);
+        currentHostInfo.sessionConnected = _sessionConnected;
+    }
+
     //--------- 采样
     //全部采样
     public void sampleAll(){
@@ -101,10 +107,12 @@ public class HostMonitor implements Runnable {
         String command = "cat /proc/net/dev";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
             for(int j=0;j<commandResult.size();j++){
                 String currentLine = commandResult.get(j);
                 if(currentLine.contains("eth0")){
-
                     String[] datas = currentLine.split("\\s+");
                     //数据设置
                     HostInfo currentHostInfo = hostInfoList.get(i);
@@ -125,20 +133,24 @@ public class HostMonitor implements Runnable {
         String command = "cat /proc/stat";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
 
-            String currentLine = commandResult.get(0);
-            if(currentLine.contains("cpu")){
-                String[] datas = currentLine.split("\\s+");
-                int totalTime = 0;
-                for(int j=1;j<=7;j++){
-                    totalTime += Integer.parseInt(datas[j]);
+            if(commandResult.size()!= 0 ){
+                String currentLine = commandResult.get(0);
+                if(currentLine.contains("cpu")){
+                    String[] datas = currentLine.split("\\s+");
+                    int totalTime = 0;
+                    for(int j=1;j<=7;j++){
+                        totalTime += Integer.parseInt(datas[j]);
+                    }
+
+                    HostInfo currentHostInfo = hostInfoList.get(i);
+                    currentHostInfo.cpuTotalTime[0] = currentHostInfo.cpuTotalTime[1];
+                    currentHostInfo.cpuTotalTime[1] = totalTime;
+                    currentHostInfo.cpuIdleTime[0] = currentHostInfo.cpuIdleTime[1];
+                    currentHostInfo.cpuIdleTime[1] = Integer.parseInt(datas[4]);
                 }
-
-                HostInfo currentHostInfo = hostInfoList.get(i);
-                currentHostInfo.cpuTotalTime[0] = currentHostInfo.cpuTotalTime[1];
-                currentHostInfo.cpuTotalTime[1] = totalTime;
-                currentHostInfo.cpuIdleTime[0] = currentHostInfo.cpuIdleTime[1];
-                currentHostInfo.cpuIdleTime[1] = Integer.parseInt(datas[4]);
             }
         }
     }
@@ -147,10 +159,14 @@ public class HostMonitor implements Runnable {
         String command = "head -n 5 /proc/meminfo";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
-            HostInfo currentHostInfo = hostInfoList.get(i);
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
 
-            currentHostInfo.memTotal = Integer.parseInt(commandResult.get(0).split("\\s+")[1]);
-            currentHostInfo.memAvaliable = Integer.parseInt(commandResult.get(2).split("\\s+")[1]);
+            if(commandResult.size()!= 0 ){
+                HostInfo currentHostInfo = hostInfoList.get(i);
+                currentHostInfo.memTotal = Integer.parseInt(commandResult.get(0).split("\\s+")[1]);
+                currentHostInfo.memAvaliable = Integer.parseInt(commandResult.get(2).split("\\s+")[1]);
+            }
         }
     }
     //[磁盘]采样
@@ -158,6 +174,9 @@ public class HostMonitor implements Runnable {
         String command = "cat /proc/diskstats";
         for(int i=0;i<hostConfigInfoList.size();i++){
             List<String> commandResult = runCommand(command, hostConfigInfoList.get(i));
+            //设置连接状态
+            setSessionConnected(i, commandResult.size() != 0);
+
             for(String resultLine:commandResult){
                 if(resultLine.contains("vda")){
                     HostInfo currentHostInfo = hostInfoList.get(i);
@@ -221,6 +240,14 @@ public class HostMonitor implements Runnable {
         }
         return mapList;
     }
+    //获取当前Host状态
+    public String getHostState(){
+        JSONArray jsonArray = new JSONArray();
+        for(HostInfo hostInfo:hostInfoList){
+            jsonArray.add(hostInfo.sessionConnected ? 1:0);
+        }
+        return jsonArray.toJSONString();
+    }
     //---------多线程执行
     //多线程运行
     @Override
@@ -272,6 +299,8 @@ public class HostMonitor implements Runnable {
             newThread = null;
         }
     }
+
+
     //main-用于测试
     public static void main(String[] args) {
         HostMonitor hostMonitor = new HostMonitor();

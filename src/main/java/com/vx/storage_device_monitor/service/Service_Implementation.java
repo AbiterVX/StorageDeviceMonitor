@@ -303,4 +303,8 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return result.toJSONString();
     }
 
+    //获取当前Host状态
+    public String getHostState(){
+        return hostMonitor.getHostState();
+    }
 }

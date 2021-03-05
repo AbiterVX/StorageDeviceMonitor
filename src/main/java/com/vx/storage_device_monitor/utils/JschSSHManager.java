@@ -46,6 +46,7 @@ public class JschSSHManager implements SSHManager{
         } catch (Exception e) {
             e.printStackTrace();
             handleException(currentSession,hostConfigInfo.ip);
+            currentSession = null;
         }
         return currentSession;
     }
@@ -57,6 +58,10 @@ public class JschSSHManager implements SSHManager{
         int returnCode = 0;
         com.jcraft.jsch.Session session = getJSCHSession(hostConfigInfo);
         ChannelExec channelExec = null;
+        if(session == null){
+            System.out.println("Session null: " + hostConfigInfo.ip);
+            return result;
+        }
         try {
             //打开通道，设置通道类型，和执行的命令
             Channel channel = session.openChannel("exec");

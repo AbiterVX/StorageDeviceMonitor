@@ -116,12 +116,20 @@ public class MainController {
         System.out.println(result);
         return result;
     }
+
     @ResponseBody
     @RequestMapping(value="/getFieldInfoList",method=RequestMethod.POST)
-    public String postGetFieldInfoList(@RequestBody Map<String,String> map){
-        int index=Integer.parseInt(map.get("index"));
-        String field=map.get("field");
-        String result=service_implementation.getRecentInfoByIp(service_implementation.getHostIp(index),2,FieldType.fromString(field));
+    public String postGetFieldInfoList(@RequestBody Map<String,String> map) {
+        int index = Integer.parseInt(map.get("index"));
+        String field = map.get("field");
+        String result = service_implementation.getRecentInfoByIp(service_implementation.getHostIp(index), 2, FieldType.fromString(field));
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value="/getHostState",method=RequestMethod.POST)
+    public String postGetHostState(){
+        String result=service_implementation.getHostState();
         System.out.println(result);
         return result;
     }

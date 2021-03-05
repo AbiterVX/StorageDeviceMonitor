@@ -19,6 +19,8 @@ public class HostInfo {
         cpuIdleTime = new int[2];
         ioTimeSpent = new int[2];
         initValue();
+
+        sessionConnected = false;
     }
 
     public void initValue(){
@@ -30,6 +32,10 @@ public class HostInfo {
         memAvaliable = 0;
         Arrays.fill(ioTimeSpent,0);
     }
+    //会话建立
+    public boolean sessionConnected;
+
+
     //ip
     public String ip;
 
@@ -58,6 +64,7 @@ public class HostInfo {
     public float energyConsumption;
     //IO数量
     public int[] ioNum;
+
 
     //----------硬件型号
     //CPU型号
@@ -125,25 +132,33 @@ public class HostInfo {
     //得出用于前端显示的数据
     public Map<String, Object> getOutputData(int interval_ms){
         Map<String, Object> resultMap=new HashMap<>();
-        float[] netBindWidth = getNetBindWidth();
-        float cpuUsage = getCpuUsage();
-        float memoryUsage = getMemoryUsage();
-        float diskUsage = getDiskUsage(interval_ms);
+        if(sessionConnected){
+            float[] netBindWidth = getNetBindWidth();
+            float cpuUsage = getCpuUsage();
+            float memoryUsage = getMemoryUsage();
+            float diskUsage = getDiskUsage(interval_ms);
+            SimpleDateFormat sdf = new SimpleDateFormat();// 格式化时间
+            sdf.applyPattern("yyyy/MM/dd HH:mm:ss");// a为am/pm的标记
 
+            resultMap.put("timestamp",new Timestamp(System.currentTimeMillis()));
+            resultMap.put("ip",ip);
+            resultMap.put("receiveBW",netBindWidth[0]);
+            resultMap.put("transmitBW",netBindWidth[1]);
+            resultMap.put("cpuUsage",cpuUsage);
+            resultMap.put("memoryUsage",memoryUsage);
+            resultMap.put("diskUsage",diskUsage);
+        }
+        else{
+            String emptyLabel = "--";
+            resultMap.put("timestamp",emptyLabel);
+            resultMap.put("ip",ip);
+            resultMap.put("receiveBW",emptyLabel);
+            resultMap.put("transmitBW",emptyLabel);
+            resultMap.put("cpuUsage",emptyLabel);
+            resultMap.put("memoryUsage",emptyLabel);
+            resultMap.put("diskUsage",emptyLabel);
+        }
 
-        SimpleDateFormat sdf = new SimpleDateFormat();// 格式化时间
-        sdf.applyPattern("yyyy/MM/dd HH:mm:ss");// a为am/pm的标记
-        // 获取当前时间
-        ;
-        //System.out.println(date.toString());
-
-        resultMap.put("timestamp",new Timestamp(System.currentTimeMillis()));
-        resultMap.put("ip",ip);
-        resultMap.put("receiveBW",netBindWidth[0]);
-        resultMap.put("transmitBW",netBindWidth[1]);
-        resultMap.put("cpuUsage",cpuUsage);
-        resultMap.put("memoryUsage",memoryUsage);
-        resultMap.put("diskUsage",diskUsage);
 
         return resultMap;
     }

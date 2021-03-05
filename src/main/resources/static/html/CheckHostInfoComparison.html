@@ -104,25 +104,30 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                     <h2 class="h2">资源利用对比</h2>
 
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <!-- 类型下拉菜单-->
-                        <div style="margin-right: 20px;">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="TypeDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                --
-                            </button>
-                            <div id="TypeDropDownMenu" class="dropdown-menu" aria-labelledby="TypeDropDownBtn">
-                                <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                    <div class="btn-toolbar mb-3" role="toolbar">
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <!-- 类型下拉菜单-->
+                            <div style="margin-right: 20px;">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="TypeDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    --
+                                </button>
+                                <div id="TypeDropDownMenu" class="dropdown-menu" aria-labelledby="TypeDropDownBtn">
+                                    <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- IP下拉菜单-->
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            0.0.0.0
-                        </button>
-                        <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
-                            <a class="dropdown-item" href="#" onclick="FSelectType(0)"> 0.0.0.0</a>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <!-- IP下拉菜单-->
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                0.0.0.0
+                            </button>
+                            <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
+                                <a class="dropdown-item" href="#" onclick="FSelectType(0)"> 0.0.0.0</a>
+                            </div>
                         </div>
                     </div>
+
                 </div>
                 <!-- 图表-->
                 <div id="UsageComparisonChart" style="width: 100%;height: 350px;"></div>
@@ -157,7 +162,7 @@
         var typeDropDownMenuHtml = ""
         for(var i=0;i<TypeDropdownBtnLabel.length;i++){
             typeDropDownMenuHtml +=
-                "<a class=\"dropdown-item\" href=\"#\" onclick=\"FSelectType('"+ i +")\">" + TypeDropdownBtnLabel[i] +"</a>";
+                "<a class=\"dropdown-item\" href=\"#\" onclick=\"FSelectType("+ i +")\">" + TypeDropdownBtnLabel[i] +"</a>";
         }
         typeDropDownMenu.innerHTML = typeDropDownMenuHtml;
 
@@ -170,19 +175,7 @@
         //alert(currentHostIp)
     }
 
-    //类型下拉菜单-选择类型
-    function FSelectType(index){
-        typeDropdownBtn.innerText = TypeDropdownBtnLabel[index];
-        currentTypeIndex = index;
 
-        //重置图表数据
-        resetData();
-        //刷新图表数据数据
-        FRefreshHostTypeInfo();
-        //初始化图表
-        FRefreshTable(usageComparisonChart,usageComparisonData,FGetHostIpList(),FGetUnitLabel(),TypeDropdownBtnLabel[index]);
-
-    }
 
     //获取单位
     function FGetUnitLabel(typeIndex){
@@ -206,7 +199,7 @@
         }
     }
     //初始化图表
-    function FRefreshTable(currentChart,currentData,seriesName,unitLabel,titleTxt){
+    function FInitTable(currentChart,currentData,seriesName,unitLabel,titleTxt){
         var option = {
             title: {
                 text: titleTxt
@@ -310,7 +303,7 @@
 
     //获取某一时段某一类型主机信息
     function FGetRecentHostTypeInfoList(hostIndex,type) {
-        var parameterData = '{"index": ' + hostIndex+'}';
+        var parameterData = '{"index": ' + hostIndex+ 'type:"' + type +'"}';
         var jsonData = null;
         $.ajax({
             type:"post",
@@ -346,8 +339,7 @@
         //插入信息数据与更新表格
         FRefreshChart(usageComparisonChart, usageComparisonData, currentHostIpIndex);
     }
-
-    //刷新表格
+    //刷新表格显示数据
     function FRefreshChart(currentChart,currentData,newDataName){
         var option = {
             series: []
@@ -360,21 +352,26 @@
         currentChart.setOption(option);
     }
 
+
+    //类型下拉菜单-选择类型
+    function FSelectType(index){
+        if(index !== currentTypeIndex){
+            typeDropdownBtn.innerText = TypeDropdownBtnLabel[index];
+            currentTypeIndex = index;
+            //重置图表数据
+            resetData();
+            //刷新图表数据数据
+            FRefreshHostTypeInfo();
+            //初始化图表
+            FInitTable(usageComparisonChart,usageComparisonData,FGetHostIpList(),FGetUnitLabel(),TypeDropdownBtnLabel[index]);
+
+        }
+    }
+
     //下拉菜单选项回调
     function FSelectBtnCallback(index){
         //设置当前选中的索引
         currentHostIpIndex = index;
-        //清除图表
-        //CPU
-        usageData = [ [],[], []  ];
-        //内存
-        temperatureData = [ [] ];
-        //网络带宽
-        netBindWidthData = [ [], [] ];
-
-        FClearChart(usageData,usageChart);
-        FClearChart(temperatureData,temperatureChart);
-        FClearChart(netBindWidthData,netBindWidthChart);
 
     }
 
