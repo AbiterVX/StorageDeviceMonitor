@@ -73,7 +73,7 @@ public class MainController {
     @RequestMapping(value = "/getHostInfoList", method = RequestMethod.POST)
     public String postGetHostInfoList(){
         String result = service_implementation.getHostInfoListOutputData();
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
 
@@ -82,7 +82,7 @@ public class MainController {
     @RequestMapping(value = "/getHostIpList", method = RequestMethod.POST)
     public String postGetHostIpList(){
         String result = service_implementation.getHostIpList();
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
 
@@ -90,7 +90,7 @@ public class MainController {
     @RequestMapping(value = "/getHostHardWareList", method = RequestMethod.POST)
     public String postGetHostHardwareList(){
         String result = service_implementation.getHostHardwareInfoListOutputData();
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
 
@@ -106,14 +106,14 @@ public class MainController {
     public String postGetDiskFailure(@RequestBody Map<String,String> map){
         int index=Integer.parseInt(map.get("index"));
         String result=service_implementation.getDiskFailureList(service_implementation.getHostIp(index));
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
     @ResponseBody
     @RequestMapping(value="/getAllDeviceInfo",method=RequestMethod.POST)
     public String postGetAllDeviceCpuUsage(@RequestBody Map<String,String> map){
         String result=service_implementation.getAllDeviceCpuUsage(2);
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
 
@@ -130,7 +130,7 @@ public class MainController {
     @RequestMapping(value="/getHostState",method=RequestMethod.POST)
     public String postGetHostState(){
         String result=service_implementation.getHostState();
-        //System.out.println(result);
+        System.out.println(result);
         return result;
     }
 }

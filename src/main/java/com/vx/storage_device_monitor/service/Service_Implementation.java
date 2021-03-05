@@ -98,10 +98,10 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
 //                    e.printStackTrace();
 //                }
                 //采样
-                while (hostMonitor.isDataHasBeenWritten()) ;
+                //while (hostMonitor.isDataHasBeenWritten()) ;
                 count++;
                 if (count % 12 == 11) {
-                    //System.out.println("In the function run() of persistanceThread: "+count);
+                    System.out.println("In the function run() of persistanceThread: "+count);
                     List<Map<String, Object>> listForWritten = hostMonitor.getOriginalHostInfoListOutputData();
                     for (Map<String, Object> iterable : listForWritten) {
                         dao_record.insertNewRecord((String) iterable.get("ip"), (Timestamp) iterable.get("timestamp"), (float) iterable.get("receiveBW"), (float) iterable.get("transmitBW"),
@@ -111,7 +111,7 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                 }
                 //等待
 
-                hostMonitor.setDataHasBeenWritten(true);
+                //hostMonitor.setDataHasBeenWritten(true);
                 try {
                     Thread.sleep(interval_ms);
                 }

@@ -344,17 +344,12 @@ public class HostMonitor implements Runnable {
 
         while(threadStart){
             //System.out.println("Check:"+isDataHasBeenWritten);
-            while(!isDataHasBeenWritten);
+            //while(!isDataHasBeenWritten);
             //采样
             sampleAll();
             //获取
-
-            for(HostInfo hostInfo:hostInfoList){
-                //System.out.println("In function run() of HostMonitor"+hostInfo.getOutputData(interval_ms).toString());
-            }
-
             //等待
-            setDataHasBeenWritten(false);
+            //setDataHasBeenWritten(false);
             try {
                 Thread.sleep(interval_ms);
             }
