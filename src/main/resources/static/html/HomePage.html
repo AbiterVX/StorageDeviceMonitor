@@ -136,6 +136,7 @@
                                 <th scope="col">磁盘利用率</th>
                                 <th scope="col">网络接受数据</th>
                                 <th scope="col">网络发送数据</th>
+                                <th scope="col">温度</th>
                             </tr>
                         </thead>
                         <tbody id ="HostInfoListTable">
@@ -228,32 +229,51 @@
         if(jsonData != null){
             var HostIpListHtml = ""
             for(var i=0;i< jsonData.length;i++){
+                var cpuUsage = FSetUnitLabel(jsonData[i]["cpuUsage"],"%");
+                var memoryUsage = FSetUnitLabel(jsonData[i]["memoryUsage"],"%");
+                var diskUsage = FSetUnitLabel(jsonData[i]["diskUsage"]," Kb/s");
+                var receiveBW = FSetUnitLabel(jsonData[i]["receiveBW"]," Kb/s");
+                var transmitBW = FSetUnitLabel(jsonData[i]["transmitBW"]," ℃");
+
+
                 HostIpListHtml +=   '<tr>' +
                     '  <th scope="row">'+jsonData[i]["ip"]  +'</th>' +
                     '  <td>'+
                     '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
                     '      <div style="width: '+ jsonData[i]["cpuUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["cpuUsage"]+'%</h6>' +
+                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + cpuUsage+'</h6>' +
                     '  </div></td>' +
 
                     '  <td>'+
                     '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
                     '      <div style="width: '+ jsonData[i]["memoryUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["memoryUsage"]+'%</h6>' +
+                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + memoryUsage+'</h6>' +
                     '  </div></td>' +
 
                     '  <td>'+
                     '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
                     '      <div style="width: '+ jsonData[i]["diskUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + jsonData[i]["diskUsage"]+'%</h6>' +
+                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' +diskUsage +'</h6>' +
                     '  </div></td>' +
 
-                    '  <td>'+jsonData[i]["receiveBW"]  +' Kb/s</td>' +
-                    '  <td>'+jsonData[i]["transmitBW"]  +'Kb/s</td>' +
+                    '  <td>'+receiveBW   +'</td>' +
+                    '  <td>'+transmitBW   +'</td>' +
+                    '  <td>'+ "--"  +'</td>' +
                     '</tr>';
             }
             hostInfoListTable.innerHTML = HostIpListHtml;
         }
+    }
+
+    function FSetUnitLabel(data,unitlabel){
+        var resultTxt;
+        if(data !== "--"){
+            resultTxt = data + unitlabel;
+        }
+        else{
+            resultTxt = "Down";
+        }
+        return resultTxt;
     }
     //下拉菜单选项回调
     function FSelectBtnCallback(index){
