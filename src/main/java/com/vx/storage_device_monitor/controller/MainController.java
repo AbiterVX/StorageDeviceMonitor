@@ -1,6 +1,7 @@
 package com.vx.storage_device_monitor.controller;
 
 
+import com.vx.storage_device_monitor.dao.entity.FieldType;
 import com.vx.storage_device_monitor.dao.entity.Record;
 import com.vx.storage_device_monitor.service.Service_Implementation;
 import com.vx.storage_device_monitor.utils.HostConfigInfo;
@@ -115,6 +116,13 @@ public class MainController {
         System.out.println(result);
         return result;
     }
-
-
+    @ResponseBody
+    @RequestMapping(value="/getFieldInfoList",method=RequestMethod.POST)
+    public String postGetFieldInfoList(@RequestBody Map<String,String> map){
+        int index=Integer.parseInt(map.get("index"));
+        String field=map.get("field");
+        String result=service_implementation.getRecentInfoByIp(service_implementation.getHostIp(index),2,FieldType.fromString(field));
+        System.out.println(result);
+        return result;
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,6 +139,8 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     @Override
     public String getRecentInfoByIp(String ip, int numberOfDays, FieldType fieldType) {
         String result;
+        JSONObject resultObject=new JSONObject();
+        String fidldName=fieldType.value();
         switch(fieldType){
             case CPUUSAGE:
                 result=JSON.toJSONString(dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
@@ -180,7 +183,21 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
         }
-        return result;
+        System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+result);
+        JSONArray jsonArray=JSONArray.parseArray(result);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<jsonArray.size();i++){
+            JSONObject temp=jsonArray.getJSONObject(i);
+            System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+temp.toJSONString());
+            fieldArray.add((BigDecimal)temp.get(fidldName+"f"));
+            timestampArray.add(temp.get("timestamp"));
+        }
+        resultObject.put(fidldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
     }
     public String getFullRecordsByIP(String ip, int numberOfDays){
         int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
