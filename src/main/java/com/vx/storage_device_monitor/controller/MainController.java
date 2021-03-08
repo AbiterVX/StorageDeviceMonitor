@@ -96,9 +96,11 @@ public class MainController {
 
     @ResponseBody
     @RequestMapping(value = "/getRecentHostInfoList", method = RequestMethod.POST)
-    public String postGetRecentHostInfoList(@RequestBody Map<String,String> map){
-        int index=Integer.parseInt(map.get("index"));
-        String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIp(index),2);
+    public String postGetRecentHostInfoList(@RequestBody Map<String,Integer> map){
+        int index=map.get("index");
+        int minute=map.get("dateInterval");
+        //System.out.println("dateInterval:"+minute);
+        String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIp(index),minute);
         return result;
     }
     @ResponseBody
@@ -112,7 +114,8 @@ public class MainController {
     @ResponseBody
     @RequestMapping(value="/getAllDeviceInfo",method=RequestMethod.POST)
     public String postGetAllDeviceCpuUsage(@RequestBody Map<String,String> map){
-        String result=service_implementation.getAllDeviceCpuUsage(2);
+        int hour=Integer.parseInt(map.get("dateInterval"));
+        String result=service_implementation.getAllDeviceUsage(hour);
         System.out.println(result);
         return result;
     }
@@ -121,8 +124,9 @@ public class MainController {
     @RequestMapping(value="/getFieldInfoList",method=RequestMethod.POST)
     public String postGetFieldInfoList(@RequestBody Map<String,String> map) {
         int index = Integer.parseInt(map.get("index"));
+        int hour=Integer.parseInt(map.get("dateInterval"));
         String field = map.get("field");
-        String result = service_implementation.getRecentInfoByIp(service_implementation.getHostIp(index), 2, FieldType.fromString(field));
+        String result = service_implementation.getRecentInfoByIp(service_implementation.getHostIp(index), hour, FieldType.fromString(field));
         return result;
     }
 

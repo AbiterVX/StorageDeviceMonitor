@@ -138,49 +138,49 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return dao_record.getIOWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),new Timestamp(System.currentTimeMillis()),ip);
     }
     @Override
-    public String getRecentInfoByIp(String ip, int numberOfDays, FieldType fieldType) {
+    public String getRecentInfoByIp(String ip, int numberOfHours, FieldType fieldType) {
         String result;
         JSONObject resultObject=new JSONObject();
         String fidldName=fieldType.value();
         switch(fieldType){
             case CPUUSAGE:
-                result=JSON.toJSONString(dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case MEMORYUSAGE:
-                result=JSON.toJSONString(dao_record.getMemoryUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getMemoryUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case DISKUSAGE:
-                result=JSON.toJSONString(dao_record.getDiskUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getDiskUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case RECEIVEBANDWIDTH:
-                result=JSON.toJSONString(dao_record.getReceiveBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getReceiveBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case TRANSMITBANDWIDTH:
-                result=JSON.toJSONString(dao_record.getTransmitBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getTransmitBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case INPUTNUMBER:
-                result=JSON.toJSONString(dao_record.getInumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getInumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case OUTPUTNUMBER:
-                result=JSON.toJSONString(dao_record.getOnumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getOnumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case TEMPERATURE:
-                result=JSON.toJSONString(dao_record.getTempWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getTempWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             case ENERGY:
-                result=JSON.toJSONString(dao_record.getEnergyWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.getEnergyWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
             default:
-                result=JSON.toJSONString(dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+                result=JSON.toJSONString(dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                         new Timestamp(System.currentTimeMillis()),ip));
                 break;
         }
@@ -205,10 +205,11 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         resultArray.add(resultObject);
         return resultArray.toJSONString();
     }
-    public String getFullRecordsByIP(String ip, int numberOfDays){
-        int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+    public String getFullRecordsByIP(String ip, int numberOfMinutes){
+        int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
                 new Timestamp(System.currentTimeMillis()),ip);
-        List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+        //System.out.println("长度"+numberOfEntry);
+        List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
                 new Timestamp(System.currentTimeMillis()),ip);
         Float[] temp=new Float[numberOfEntry];
         Float[] cpuUsage=new Float[numberOfEntry];
@@ -269,15 +270,15 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     }
 
 
-    public String getAllDeviceCpuUsage(int numberOfDays) {
+    public String getAllDeviceUsage(int numberOfHours) {
         JSONArray jsonArray=JSON.parseArray(getHostIpList());
         JSONArray result=new JSONArray();
         for(Object object:jsonArray.stream().toArray()){
             JSONObject tempObject=new JSONObject();
             tempObject.put("ip",(String)object);
-            int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+            int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                     new Timestamp(System.currentTimeMillis()),(String)object);
-            List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),
+            List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
                     new Timestamp(System.currentTimeMillis()),(String)object);
             Float[] temp=new Float[numberOfEntry];
             Float[] cpuUsage=new Float[numberOfEntry];
