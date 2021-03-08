@@ -16,6 +16,8 @@
 
     <!-- functionLibrary -->
     <script type="text/javascript" src="../js/functionLibrary.js"></script>
+    <script type="text/javascript" src="../js/DataRequest.js"></script>
+    <script type="text/javascript" src="../js/WidgetDisplay.js"></script>
 </head>
 
 <body>
@@ -32,56 +34,39 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">仪表盘</a>
                 </li>
-                <!--
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown link
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                -->
             </ul>
         </div>
     </nav>
 
     <div class="container-fluid">
         <div class="row">
+            <!-- 左侧导航项 -->
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
+                        <!-- 导航项 -->
                         <li class="nav-item">
-                            <a class="nav-link active" href="/">
+                            <a id="NavItem1" class="nav-link"  href="/">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                设备配置 <span class="sr-only">(current)</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" style="color:black;font-weight:bold;" href="CheckHostInfo">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                资源利用
+                                节点状态 <span class="sr-only">(current)</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="CheckHostInfoComparison">
+                            <a id="NavItem3" class="nav-link" href="CheckHostInfoComparison">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                                 资源利用对比
                             </a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link" href="CheckDiskFailureInfo">
+                            <a id="NavItem4" class="nav-link" href="CheckDiskFailureInfo">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
                                 磁盘故障
                             </a>
                         </li>
-
                     </ul>
 
+                    <!-- 节点列表 -->
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>计算与存储节点</span>
                     </h6>
@@ -139,6 +124,13 @@
                 <!-- 利用率图表-->
                 <div id="UsageChart" style="width: 100%;height: 350px;"></div>
 
+                <!-- 网络带宽标题-->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h2">网络带宽</h2>
+                </div>
+                <!-- 网络带宽图表-->
+                <div id="NetBindWidthChart" style="width: 100%;height: 350px;"></div>
+
                 <!-- 温度标题-->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                     <h2 class="h2">温度</h2>
@@ -146,12 +138,6 @@
                 <!-- 温度图表-->
                 <div id="TemperatureChart" style="width: 100%;height: 350px;"></div>
 
-                <!-- 网络带宽标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">网络带宽</h2>
-                </div>
-                <!-- 网络带宽图表-->
-                <div id="NetBindWidthChart" style="width: 100%;height: 350px;"></div>
             </main>
         </div>
     </div>
@@ -159,9 +145,7 @@
 
 <script >
     //下拉菜单-当前选择的host index
-    var currentHostIpIndex = 0;
-    //更新HostState定时任务
-    var refreshHostState;
+    var currentHostIpIndex = -1;
     //更新间隔
     var refreshInterval = 1000 * 5;
     //-----利用率表
@@ -186,35 +170,25 @@
 
     //页面加载完成后执行
     window.onload=function (){
-        //设置主机IP列表
-        FSetHostIpList("HostIpList");
-        refreshHostState = window.setInterval ('FSetHostIpList("HostIpList")',refreshInterval);
-        //设置下拉菜单
-        FSetDropDownMenu("HostIpDropDownBtn","HostIpDropDownMenu","FSelectBtnCallback");
 
+        //设置左侧导航栏当前选中的导航项
+        //setCurrentNavItem(2);
+        //初始化左侧导航栏HostIP列表
+        FInitHostIpList();
+        //定时任务:更新HostState
+        window.setInterval (FInitHostIpList,refreshInterval);
+
+        //初始化HostIp下拉菜单
+        var hostIndex = FGetCheckHostInfoJumpIndex();
+        FSelectBtnCallback(hostIndex);
+        FInitHostIpDropDownMenu("FSelectBtnCallback",hostIndex);
         //-----初始化利用率表格
         FInitTable(usageChart,usageData,["CPU","内存","磁盘"],"%");
         FInitTable(temperatureChart,temperatureData,["温度"],"℃");
         FInitTable(netBindWidthChart,netBindWidthData,["数据接受","数据发送"],"Kb/s");
 
-        //刷新数据
-        setTimeout(FRefreshHostInfoList,10);
-        //FRefreshHostInfoList();
-
-        //日期间隔下拉菜单
-        //设置下拉选项
-
-        var dateIntervalDropDownMenu = document.getElementById("DateIntervalDropDownMenu");
-        var dateIntervalDropDownMenuHtml = ""
-        var jsonData = FGetHostIpList();
-        for(var i=0;i< dateIntervalLabel.length;i++){
-            dateIntervalDropDownMenuHtml +=
-                "<a class=\"dropdown-item\" href=\"#\" onclick=\"FSelectDateInterval("+ i +")\">" + dateIntervalLabel[i] +"</a>"
-        }
-        dateIntervalDropDownMenu.innerHTML = dateIntervalDropDownMenuHtml;
-        //下拉按钮当前显示Txt
-        var dateIntervalDropDownBtn = document.getElementById("DateIntervalDropDownBtn");
-        dateIntervalDropDownBtn.innerText = dateIntervalLabel[0];
+        //初始化DateInterval下拉菜单
+        FInitDateIntervalDropDownMenu(dateIntervalLabel,"FSelectDateInterval");
     }
 
     function FGetHostInfo(currentHostIp){
@@ -255,8 +229,9 @@
         //dateString = date.format("yyyy/MM/dd hh:mm:ss");
         return dateString;
     }
+
     //获取主机信息
-    async function FRefreshHostInfoList() {
+    async function FRefreshHostRecentInfo() {
         var jsonData = FGetRecentHostInfoList(currentHostIpIndex,dateInterval[currentDateIntervalIndex]);
         if(jsonData != null){
             //添加数据
@@ -276,11 +251,7 @@
             }
 
             //插入信息数据与更新表格
-            //setTimeout(FRefreshChart,10,usageChart,usageData,currentHostIpIndex);
-            //setTimeout(FRefreshChart,10,temperatureChart,temperatureData,currentHostIpIndex);
-            //setTimeout(FRefreshChart,10,netBindWidthChart,netBindWidthData,currentHostIpIndex);
-
-            FRefreshChart(usageChart,usageData,currentHostIpIndex);
+            FRefreshChart(usageChart, usageData, currentHostIpIndex);
             FRefreshChart(temperatureChart,temperatureData,currentHostIpIndex);
             FRefreshChart(netBindWidthChart,netBindWidthData,currentHostIpIndex);
         }
@@ -349,11 +320,12 @@
             },]
         };
         //单位为百分比，设置间距与范围
+        /*
         if(unitLabel === "%" || unitLabel === "℃"){
             option["yAxis"]["max"] = 100;
             option["yAxis"]["min"] = 0;
             option["yAxis"]["interval"] = 20;
-        }
+        }*/
         //series
 
         option["series"] = [];
@@ -400,7 +372,10 @@
             netBindWidthData = [ [], [] ];
 
             //刷新数据
-            FRefreshHostInfoList();
+            FRefreshHostRecentInfo();
+
+            FSetCheckHostInfoJumpIndex(currentHostIpIndex);
+            FInitHostIpList();
         }
     }
 
@@ -418,10 +393,10 @@
             netBindWidthData = [ [], [] ];
 
             var dateIntervalDropDownBtn = document.getElementById("DateIntervalDropDownBtn");
-            dateIntervalDropDownBtn.innerText = dateIntervalLabel[currentHostIpIndex];
+            dateIntervalDropDownBtn.innerText = dateIntervalLabel[currentDateIntervalIndex];
 
             //刷新数据
-            FRefreshHostInfoList();
+            FRefreshHostRecentInfo();
         }
     }
 </script>

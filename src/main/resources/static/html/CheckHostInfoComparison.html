@@ -16,6 +16,8 @@
 
     <!-- functionLibrary -->
     <script type="text/javascript" src="../js/functionLibrary.js"></script>
+    <script type="text/javascript" src="../js/DataRequest.js"></script>
+    <script type="text/javascript" src="../js/WidgetDisplay.js"></script>
 </head>
 
 <body>
@@ -32,56 +34,39 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">仪表盘</a>
                 </li>
-                <!--
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown link
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                -->
             </ul>
         </div>
     </nav>
 
     <div class="container-fluid">
         <div class="row">
+            <!-- 左侧导航项 -->
             <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
+                        <!-- 导航项 -->
                         <li class="nav-item">
-                            <a class="nav-link active" href="/">
+                            <a id="NavItem1" class="nav-link"  href="/">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                设备配置 <span class="sr-only">(current)</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link"  href="CheckHostInfo">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                资源利用
+                                节点状态 <span class="sr-only">(current)</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" style="color:black;font-weight:bold;" href="CheckHostInfoComparison">
+                            <a id="NavItem3" class="nav-link" href="CheckHostInfoComparison">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                                 资源利用对比
                             </a>
                         </li>
-
                         <li class="nav-item">
-                            <a class="nav-link" href="CheckDiskFailureInfo">
+                            <a id="NavItem4" class="nav-link" href="CheckDiskFailureInfo">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
                                 磁盘故障
                             </a>
                         </li>
-
                     </ul>
 
+                    <!-- 节点列表 -->
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                         <span>计算与存储节点</span>
                     </h6>
@@ -95,6 +80,7 @@
                     </ul>
                 </div>
             </nav>
+
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
 
@@ -127,8 +113,6 @@
 </body>
 
 <script >
-    //更新HostState定时任务
-    var refreshHostState;
     //更新间隔
     var refreshInterval = 1000 * 5;
 
@@ -145,9 +129,13 @@
     var typeKey = ["cpuUsage","memoryUsage","diskUsage","temp","receiveBW","transmitBW"];
     //页面加载完成后执行
     window.onload=function (){
-        //设置主机IP列表
-        FSetHostIpList("HostIpList");
-        refreshHostState = window.setInterval ('FSetHostIpList("HostIpList")',refreshInterval);
+        //设置左侧导航栏当前选中的导航项
+        setCurrentNavItem(3);
+        //初始化左侧导航栏HostIP列表
+        FInitHostIpList();
+        //定时任务:更新HostState
+        window.setInterval (FInitHostIpList,refreshInterval);
+
         //init类型下拉菜单/按钮
         var typeDropDownMenu = document.getElementById("TypeDropDownMenu");
         var typeDropDownMenuHtml = ""
@@ -294,7 +282,7 @@
 
     //获取某一时段某一类型主机信息
     function FGetRecentHostTypeInfoList(hostIndex,type) {
-        var parameterData = '{"index": "'+ hostIndex +'","field":"' + type +'"}';
+        var parameterData = '{"index": "'+ hostIndex +'","field":"' + type + '","dateInterval":"' +  24   + '"}';
         var jsonData = null;
         $.ajax({
             type:"post",
