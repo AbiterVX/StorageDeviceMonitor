@@ -101,17 +101,32 @@
 
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                     <h2 class="h2">存储设备资源使用状况</h2>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <!--
-                        <div class="btn-group mr-2">
-                            <button class="btn btn-sm btn-outline-secondary">Share</button>
-                            <button class="btn btn-sm btn-outline-secondary">Export</button>
-                        </div>-->
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            0.0.0.0
-                        </button>
-                        <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
-                            <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                    <div class="btn-toolbar mb-3" role="toolbar">
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <!-- IP下拉菜单-->
+                            <div style="margin-right: 20px;">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="DateIntervalDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    -
+                                </button>
+                                <div id="DateIntervalDropDownMenu" class="dropdown-menu" aria-labelledby="DateIntervalDropDownBtn">
+                                    <a class="dropdown-item" href="#" onclick="FSelectType(0)"> 0.0.0.0</a>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <!--
+                            <div class="btn-group mr-2">
+                                <button class="btn btn-sm btn-outline-secondary">Share</button>
+                                <button class="btn btn-sm btn-outline-secondary">Export</button>
+                            </div>-->
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                0.0.0.0
+                            </button>
+                            <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
+                                <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,6 +179,11 @@
     //网络带宽
     var netBindWidthData = [ [], [] ];
 
+    //显示日期间隔
+    var currentDateIntervalIndex = 0;
+    var dateInterval = [60,24*60]
+    var dateIntervalLabel = ["过去一小时","过去一天"]
+
     //页面加载完成后执行
     window.onload=function (){
         //设置主机IP列表
@@ -180,6 +200,21 @@
         //刷新数据
         setTimeout(FRefreshHostInfoList,10);
         //FRefreshHostInfoList();
+
+        //日期间隔下拉菜单
+        //设置下拉选项
+
+        var dateIntervalDropDownMenu = document.getElementById("DateIntervalDropDownMenu");
+        var dateIntervalDropDownMenuHtml = ""
+        var jsonData = FGetHostIpList();
+        for(var i=0;i< dateIntervalLabel.length;i++){
+            dateIntervalDropDownMenuHtml +=
+                "<a class=\"dropdown-item\" href=\"#\" onclick=\"FSelectDateInterval("+ i +")\">" + dateIntervalLabel[i] +"</a>"
+        }
+        dateIntervalDropDownMenu.innerHTML = dateIntervalDropDownMenuHtml;
+        //下拉按钮当前显示Txt
+        var dateIntervalDropDownBtn = document.getElementById("DateIntervalDropDownBtn");
+        dateIntervalDropDownBtn.innerText = dateIntervalLabel[0];
     }
 
     function FGetHostInfo(currentHostIp){
@@ -187,8 +222,8 @@
     }
 
     //获取某一时段主机信息
-    function FGetRecentHostInfoList(hostIndex) {
-        var parameterData = '{"index": ' + hostIndex+'}';
+    function FGetRecentHostInfoList(hostIndex,_dateInterval) {
+        var parameterData = '{"index": ' + hostIndex+  ',"dateInterval":' + _dateInterval +'}';
         var jsonData = null;
         $.ajax({
             type:"post",
@@ -222,7 +257,7 @@
     }
     //获取主机信息
     async function FRefreshHostInfoList() {
-        var jsonData = FGetRecentHostInfoList(currentHostIpIndex);
+        var jsonData = FGetRecentHostInfoList(currentHostIpIndex,dateInterval[currentDateIntervalIndex]);
         if(jsonData != null){
             //添加数据
 
@@ -353,20 +388,42 @@
 
     //下拉菜单选项回调
     function FSelectBtnCallback(index){
-        //设置当前选中的索引
-        currentHostIpIndex = index;
-        //清除图表
-        //CPU
-        usageData = [ [],[], []  ];
-        //内存
-        temperatureData = [ [] ];
-        //网络带宽
-        netBindWidthData = [ [], [] ];
+        if(currentHostIpIndex !== index){
+            //设置当前选中的索引
+            currentHostIpIndex = index;
+            //清除图表
+            //CPU
+            usageData = [ [],[], []  ];
+            //内存
+            temperatureData = [ [] ];
+            //网络带宽
+            netBindWidthData = [ [], [] ];
 
-        //刷新数据
-        FRefreshHostInfoList();
+            //刷新数据
+            FRefreshHostInfoList();
+        }
     }
 
+    //设置日期间隔
+    function FSelectDateInterval(index){
+        if(currentDateIntervalIndex !== index){
+            //设置当前选中的索引
+            currentDateIntervalIndex = index;
+            //清除图表
+            //CPU
+            usageData = [ [],[], []  ];
+            //内存
+            temperatureData = [ [] ];
+            //网络带宽
+            netBindWidthData = [ [], [] ];
+
+            var dateIntervalDropDownBtn = document.getElementById("DateIntervalDropDownBtn");
+            dateIntervalDropDownBtn.innerText = dateIntervalLabel[currentHostIpIndex];
+
+            //刷新数据
+            FRefreshHostInfoList();
+        }
+    }
 </script>
 
 
