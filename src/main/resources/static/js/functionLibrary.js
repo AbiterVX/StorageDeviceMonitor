@@ -222,3 +222,31 @@ function FGetHostHardWareInfo(callBackFunc){
 
 }
 
+//时间戳转换
+function FGetDateTime(currentDate){
+    //时间转换
+    var date = new Date(currentDate);
+    var y = date.getFullYear();
+    var m = date.getMonth() + 1;
+    var d = date.getDate();
+    var h = date.getHours();
+    var min = date.getMinutes();
+    var s = date.getSeconds();
+    var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
+    //dateString = date.format("yyyy/MM/dd hh:mm:ss");
+    return dateString;
+}
+
+//为数据添加单位Label
+function FAddDataUnitLabel(data,unitlabel){
+    var resultTxt;
+    if(data !== "--"){
+        resultTxt = data + unitlabel;
+    }
+    else{
+        resultTxt = "Down";
+    }
+    return resultTxt;
+}
+
+

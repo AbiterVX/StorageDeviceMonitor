@@ -64,6 +64,12 @@
                                 磁盘故障
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a id="NavItem5" class="nav-link" href="CheckIOInfo">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                IO
+                            </a>
+                        </li>
                     </ul>
 
                     <!-- 节点列表 -->
@@ -170,7 +176,6 @@
 
     //页面加载完成后执行
     window.onload=function (){
-
         //设置左侧导航栏当前选中的导航项
         //setCurrentNavItem(2);
         //初始化左侧导航栏HostIP列表
@@ -215,20 +220,6 @@
         });
         return jsonData;
     }
-    //时间戳转换
-    function FGetDateTime(currentDate){
-        //时间转换
-        var date = new Date(currentDate);
-        var y = date.getFullYear();
-        var m = date.getMonth() + 1;
-        var d = date.getDate();
-        var h = date.getHours();
-        var min = date.getMinutes();
-        var s = date.getSeconds();
-        var dateString = [y, m, d].join('/') + " " + [h, min, s].join(':');
-        //dateString = date.format("yyyy/MM/dd hh:mm:ss");
-        return dateString;
-    }
 
     //获取主机信息
     async function FRefreshHostRecentInfo() {
@@ -247,7 +238,7 @@
                 temperatureData[0].push([  dateString,jsonData["temp"][i]  ]);
                 //网络带宽
                 netBindWidthData[0].push([  dateString,jsonData["receiveBW"][i]  ]);
-                netBindWidthData[1].push([  dateString,jsonData["transmitBW"][i]  ]);
+                netBindWidthData[1].push([  dateString,jsonData["transmitBW"][i] ]);
             }
 
             //插入信息数据与更新表格
