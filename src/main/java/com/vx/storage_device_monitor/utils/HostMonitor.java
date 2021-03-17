@@ -45,12 +45,21 @@ public class HostMonitor implements Runnable {
     //线程开始
     public boolean threadStart;
     private boolean isDataHasBeenWritten=true;
-
-
+    private volatile static HostMonitor hostMonitor;
+    public static HostMonitor getInstance(){
+        if(hostMonitor==null){
+            synchronized (HostMonitor.class){
+                if(hostMonitor==null){
+                    hostMonitor=new HostMonitor();
+                }
+            }
+        }
+        return hostMonitor;
+    }
 
 
     //---------Init
-    public HostMonitor(){
+    private HostMonitor(){
         //延迟时间默认为10 * 1000，单位：ms
         this(10 * 1000);
     }
@@ -310,7 +319,6 @@ public class HostMonitor implements Runnable {
         }
     }
 
-
     //获取Host的IP
     public String getHostIpList(){
         JSONArray jsonArray = new JSONArray();
@@ -320,10 +328,10 @@ public class HostMonitor implements Runnable {
         return jsonArray.toJSONString();
     }
     public List<Map<String,Object>> getOriginalHostInfoListOutputData(){
-        ArrayList<Map<String,Object>> mapList=new ArrayList<>();
-        for(HostInfo hostInfo:hostInfoList){
-            Map<String, Object> result = hostInfo.getOutputData(interval_ms);
-            mapList.add(result);
+        ArrayList<Map<String,Object>> mapList=new ArrayList<Map<String,Object>>();
+        for(int i=0;i<hostInfoList.size();i++){
+            Map<String, Object> result = hostInfoList.get(i).getOutputData(interval_ms);
+            mapList.add(i,result);
         }
         return mapList;
     }
@@ -334,6 +342,13 @@ public class HostMonitor implements Runnable {
             jsonArray.add(hostInfo.sessionConnected ? 1:0);
         }
         return jsonArray.toJSONString();
+    }
+    public List<Boolean> getHostStateList(){
+        ArrayList<Boolean> arrayList=new ArrayList<>();
+        for(HostInfo hostInfo:hostInfoList){
+            arrayList.add(hostInfo.sessionConnected);
+        }
+        return arrayList;
     }
     //---------多线程执行
     //多线程运行
@@ -357,6 +372,9 @@ public class HostMonitor implements Runnable {
                 e.printStackTrace();
             }
         }
+
+    }
+    public void checkState(){
 
     }
     //开始线程

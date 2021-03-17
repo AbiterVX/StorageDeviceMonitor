@@ -29,7 +29,7 @@ public interface Dao_record {
                          @Param("temp")float temp,
                          @Param("energy")float energy
                          );
-    @Select("select * from NodeRecord where ip=#{ip}")
+    @Select("select * from NodeRecord where ip=#{ip} order by timestamp")
     List<Record> recordQueryWithIP(@Param("ip") String ip);
 
     @Select("select * from NodeRecord " +

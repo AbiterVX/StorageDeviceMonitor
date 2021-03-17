@@ -15,11 +15,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Order(value=1)
@@ -28,31 +26,42 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     private Dao_record dao_record;
     @Autowired
     private Dao_disk dao_disk;
-    private HostMonitor hostMonitor=new HostMonitor();
+    private HostMonitor hostMonitor=HostMonitor.getInstance();
     private Thread pThread=null;
+    private Thread uThread=null;
+    private String[] indexEntry={};
+    /**
+     * 目前用于内存查询
+     */
+    private static HashMap<String, String> quickQuery=new HashMap<>();
     @Override
     public void insertNewRecord(String ip, Timestamp timestamp,float receiveBW,float transmitBW,float cpuUsage,float memoryUsage,
                                       float diskUsage,int iNumber,int oNumber,float temp,float energy) {
+
         dao_record.insertNewRecord(ip,timestamp,receiveBW,transmitBW,cpuUsage,memoryUsage,diskUsage,iNumber,oNumber,temp,energy);
+//        if(quickQuery.containsKey(ip)){
+//            quickQuery.get(ip).add();
+//        }
     }
 
     @Override
     public void run(ApplicationArguments args) {
+        memoryDataLoad();
         startMonitor();
         periodPersistence();
+        periodMemoryUpdate();
         try {
             hostMonitor.getNewThread().join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
-
-    @Override
-    public void periodPersistence() {
-        if(pThread==null) {
-            pThread = new Thread(new PersistenceThread(), "The thread to persist");
-            pThread.start();
-
+    public void memoryDataLoad(){
+        JSONArray iplist=JSONArray.parseArray(hostMonitor.getHostIpList());
+        for(int i=0;i<iplist.size();i++){
+            String temp=(String)iplist.get(i);
+            quickQuery.put(temp+"-60",getRecentInfoByIp(temp,60,FieldType.ALLFIELDS));
+            quickQuery.put(temp+"-1440",getRecentInfoByIp(temp,1440,FieldType.ALLFIELDS));
         }
     }
 
@@ -81,47 +90,6 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return hostMonitor.getHostIp(index);
     }
 
-
-    private class PersistenceThread implements Runnable{
-
-        private int interval_ms;
-        public PersistenceThread(){
-            interval_ms=hostMonitor.interval_ms;
-        }
-        @Override
-        public void run() {
-            int count=0;
-            while(hostMonitor.threadStart) {
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-                //采样
-                //while (hostMonitor.isDataHasBeenWritten()) ;
-                count++;
-                if (count % 12 == 11) {
-                    System.out.println("In the function run() of persistanceThread: "+count);
-                    List<Map<String, Object>> listForWritten = hostMonitor.getOriginalHostInfoListOutputData();
-                    for (Map<String, Object> iterable : listForWritten) {
-                        dao_record.insertNewRecord((String) iterable.get("ip"), (Timestamp) iterable.get("timestamp"), (float) iterable.get("receiveBW"), (float) iterable.get("transmitBW"),
-                                (float) iterable.get("cpuUsage"), (float) iterable.get("memoryUsage"), (float) iterable.get("diskUsage"), 250, 250, 36.0f, 600.0f);
-                    }
-                    count=0;
-                }
-                //等待
-
-                //hostMonitor.setDataHasBeenWritten(true);
-                try {
-                    Thread.sleep(interval_ms);
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     private Map<String,Object> newestData(String ip){
         List<Map<String,Object>> temp=hostMonitor.getOriginalHostInfoListOutputData();
         for(Map<String,Object> iterable:temp){
@@ -138,79 +106,201 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return dao_record.getIOWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfDays*86400000),new Timestamp(System.currentTimeMillis()),ip);
     }
     @Override
-    public String getRecentInfoByIp(String ip, int numberOfHours, FieldType fieldType) {
+    public String getRecentInfoByIp(String ip, int numberOfMinutes, FieldType fieldType) {
         String result;
-        JSONObject resultObject=new JSONObject();
-        String fidldName=fieldType.value();
+        String fieldName=fieldType.value();
         switch(fieldType){
             case CPUUSAGE:
-                result=JSON.toJSONString(dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPostion1(ip,numberOfMinutes,fieldName);
                 break;
             case MEMORYUSAGE:
-                result=JSON.toJSONString(dao_record.getMemoryUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition2(ip,numberOfMinutes,fieldName);
                 break;
             case DISKUSAGE:
-                result=JSON.toJSONString(dao_record.getDiskUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition3(ip,numberOfMinutes,fieldName);
                 break;
             case RECEIVEBANDWIDTH:
-                result=JSON.toJSONString(dao_record.getReceiveBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition4(ip,numberOfMinutes,fieldName);
                 break;
             case TRANSMITBANDWIDTH:
-                result=JSON.toJSONString(dao_record.getTransmitBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition5(ip,numberOfMinutes,fieldName);
                 break;
             case INPUTNUMBER:
-                result=JSON.toJSONString(dao_record.getInumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition6(ip,numberOfMinutes,fieldName);
                 break;
             case OUTPUTNUMBER:
-                result=JSON.toJSONString(dao_record.getOnumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition7(ip,numberOfMinutes,fieldName);
                 break;
             case TEMPERATURE:
-                result=JSON.toJSONString(dao_record.getTempWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition8(ip,numberOfMinutes,fieldName);
                 break;
             case ENERGY:
-                result=JSON.toJSONString(dao_record.getEnergyWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition9(ip,numberOfMinutes,fieldName);
                 break;
             default:
-                result=JSON.toJSONString(dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
-                        new Timestamp(System.currentTimeMillis()),ip));
+                result=getRecentInfoByIpPosition10(ip,numberOfMinutes,fieldName);
                 break;
         }
-        //System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+result);
-        JSONArray jsonArray=JSONArray.parseArray(result);
+        return result;
+    }
+    private String getRecentInfoByIpPostion1(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<CpuUsageRecord> resultList=dao_record.getCpuUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
         JSONArray fieldArray=new JSONArray();
         JSONArray timestampArray=new JSONArray();
-        for(int i=0;i<jsonArray.size();i++){
-            JSONObject temp=jsonArray.getJSONObject(i);
-            //System.out.println("In the function getRecentInfoByIP in Service_Implementation:"+temp.toJSONString());
-            if(!(fidldName.equals("iNumber")||fidldName.equals("oNumber"))) {
-                fieldArray.add((BigDecimal) temp.get(fidldName + "f"));
-            }
-            else{
-                fieldArray.add((Integer) temp.get(fidldName));
-            }
-            timestampArray.add(temp.get("timestamp"));
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getCpuUsagef());
+            timestampArray.add(resultList.get(i).getTimestamp());
         }
-        resultObject.put(fidldName,fieldArray);
+        resultObject.put(fieldName,fieldArray);
         resultObject.put("timestamp",timestampArray);
         JSONArray resultArray=new JSONArray();
         resultArray.add(resultObject);
         return resultArray.toJSONString();
     }
+    private String getRecentInfoByIpPosition2(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<MemoryUsageRecord> resultList=dao_record.getMemoryUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getMemoryUsagef());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition3(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<DiskUsageRecord> resultList=dao_record.getDiskUsageWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getDiskUsagef());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition4(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<BWrecord3> resultList=dao_record.getReceiveBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getReceiveBWf());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition5(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<BWrecord2> resultList=dao_record.getTransmitBWWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getTransmitBWf());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition6(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<IOrecord2> resultList=dao_record.getInumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getiNumber());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition7(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<IOrecord3> resultList=dao_record.getOnumberWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getoNumber());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition8(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<TemperatureRecord> resultList=dao_record.getTempWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getTempf());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition9(String ip,int numberOfMinutes,String fieldName){
+        JSONObject resultObject=new JSONObject();
+        List<EnergyRecord> resultList=dao_record.getEnergyWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip);
+        JSONArray fieldArray=new JSONArray();
+        JSONArray timestampArray=new JSONArray();
+        for(int i=0;i<resultList.size();i++){
+            fieldArray.add(resultList.get(i).getEnergyf());
+            timestampArray.add(resultList.get(i).getTimestamp());
+        }
+        resultObject.put(fieldName,fieldArray);
+        resultObject.put("timestamp",timestampArray);
+        JSONArray resultArray=new JSONArray();
+        resultArray.add(resultObject);
+        return resultArray.toJSONString();
+    }
+    private String getRecentInfoByIpPosition10(String ip,int numberOfMinutes,String fieldName){
+        String result=JSON.toJSONString(dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+                new Timestamp(System.currentTimeMillis()),ip));
+        return result;
+    }
     public String getFullRecordsByIP(String ip, int numberOfMinutes){
-        int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
-                new Timestamp(System.currentTimeMillis()),ip);
-        //System.out.println("长度"+numberOfEntry);
-        List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
-                new Timestamp(System.currentTimeMillis()),ip);
+//        int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+//                new Timestamp(System.currentTimeMillis()),ip);
+//        List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
+//                new Timestamp(System.currentTimeMillis()),ip);
+        String targetObject=quickQuery.get(ip+"-"+numberOfMinutes);
+        System.out.println(targetObject);
+        List<Record> tempResult= JSON.parseArray(targetObject,Record.class);
+        int numberOfEntry=tempResult.size();
         Float[] temp=new Float[numberOfEntry];
         Float[] cpuUsage=new Float[numberOfEntry];
         Float[] diskUsage=new Float[numberOfEntry];
@@ -240,7 +330,6 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
         return result.toJSONString();
     }
 
-
     public String getDiskFailureList(String ip) {
         List<String> timestampList=dao_disk.getDiskFailureTimestamp(ip);
         String resultDate=findLatest(timestampList);
@@ -269,16 +358,15 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
 
     }
 
-
-    public String getAllDeviceUsage(int numberOfHours) {
+    public String getAllDeviceUsage(int numberOfMinutes) {
         JSONArray jsonArray=JSON.parseArray(getHostIpList());
         JSONArray result=new JSONArray();
         for(Object object:jsonArray.stream().toArray()){
             JSONObject tempObject=new JSONObject();
             tempObject.put("ip",(String)object);
-            int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
+            int numberOfEntry= dao_record.recordNumberQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
                     new Timestamp(System.currentTimeMillis()),(String)object);
-            List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfHours*3600000),
+            List<Record> tempResult=dao_record.recordQueryWithTimestamp(new Timestamp(System.currentTimeMillis()-numberOfMinutes*60000),
                     new Timestamp(System.currentTimeMillis()),(String)object);
             Float[] temp=new Float[numberOfEntry];
             Float[] cpuUsage=new Float[numberOfEntry];
@@ -313,5 +401,104 @@ public class Service_Implementation implements Service_Interface, ApplicationRun
     //获取当前Host状态
     public String getHostState(){
         return hostMonitor.getHostState();
+    }
+    private class PersistenceThread implements Runnable{
+
+        public int interval_ms;
+        public int time_offset=5000;
+        public PersistenceThread(){
+            interval_ms=hostMonitor.interval_ms;
+        }
+        @Override
+        public void run() {
+            int count=0;
+            try {
+                Thread.sleep(5*interval_ms+time_offset);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while(hostMonitor.threadStart) {
+                //while (hostMonitor.isDataHasBeenWritten()) ;
+//                count++;
+//                if (count % 12 == 11) {
+                List<Map<String, Object>> listForWritten = hostMonitor.getOriginalHostInfoListOutputData();
+                List<Boolean> stateList=hostMonitor.getHostStateList();
+                for (int i=0;i<listForWritten.size();i++){
+                    Map<String, Object> iterable=listForWritten.get(i);
+                    float receiveBW,transmitBW,cpuUsage,memoryUsage,diskUsage;
+                    receiveBW=(float) iterable.get("receiveBW");
+                    transmitBW=(float) iterable.get("transmitBW");
+                    cpuUsage=(float) iterable.get("cpuUsage");
+                    memoryUsage=(float)iterable.get("memoryUsage");
+                    diskUsage=(float) iterable.get("diskUsage");
+                    System.out.println(""+receiveBW+" "+transmitBW+" "+cpuUsage+" "+memoryUsage+" "+diskUsage);
+                    if(!(receiveBW==0.0f&&transmitBW==0.0f&&cpuUsage==0.0f&&memoryUsage==0.0f&&diskUsage==0.0f)) {
+                        if(stateList.get(i)){
+                        insertNewRecord((String) iterable.get("ip"), (Timestamp) iterable.get("timestamp"), receiveBW, transmitBW, cpuUsage, memoryUsage,
+                                diskUsage, 250, 250, 36.0f, 600.0f);}
+                        else{
+                            System.out.println((String) iterable.get("ip")+" is down,the data is meaningless.");
+                        }
+                    }
+                    else{
+                        System.out.println("All the data is 0.0f,which would happen when the first time to sample data after the system setup");
+                    }
+                }
+//                    count=0;
+//                }
+                //等待
+                //hostMonitor.setDataHasBeenWritten(true);
+                try {
+                    Thread.sleep(12*interval_ms+time_offset);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void periodPersistence() {
+        if(pThread==null) {
+            pThread = new Thread(new PersistenceThread(), "Thread to persist");
+            pThread.start();
+
+        }
+    }
+    private class MemoryUpdate implements Runnable{
+        private int interval_ms;
+        private int time_offset=3000;
+        public MemoryUpdate(){
+            this.interval_ms=hostMonitor.interval_ms;
+        }
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(12*interval_ms+time_offset);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            JSONArray iplist=JSONArray.parseArray(hostMonitor.getHostIpList());
+            while(hostMonitor.threadStart) {
+                for(int i=0;i<iplist.size();i++){
+                    String temp=(String)iplist.get(i);
+                    quickQuery.put(temp+"-60",getRecentInfoByIp(temp,60,FieldType.ALLFIELDS));
+                    quickQuery.put(temp+"-1440",getRecentInfoByIp(temp,1440,FieldType.ALLFIELDS));
+                }
+                try {
+                    Thread.sleep(15*interval_ms+time_offset);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    public void periodMemoryUpdate(){
+        if(uThread==null){
+            uThread = new Thread(new MemoryUpdate(),"Thread to update memory");
+            uThread.start();
+        }
     }
 }

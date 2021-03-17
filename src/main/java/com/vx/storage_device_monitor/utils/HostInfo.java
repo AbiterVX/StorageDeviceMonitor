@@ -139,8 +139,8 @@ public class HostInfo {
             float cpuUsage = getCpuUsage();
             float memoryUsage = getMemoryUsage();
             float diskUsage = getDiskUsage(interval_ms);
-            SimpleDateFormat sdf = new SimpleDateFormat();// 格式化时间
-            sdf.applyPattern("yyyy/MM/dd HH:mm:ss");// a为am/pm的标记
+//            SimpleDateFormat sdf = new SimpleDateFormat();// 格式化时间
+//            sdf.applyPattern("yyyy/MM/dd HH:mm:ss");// a为am/pm的标记
 
             resultMap.put("timestamp",new Timestamp(System.currentTimeMillis()));
             resultMap.put("ip",ip);
@@ -152,13 +152,13 @@ public class HostInfo {
         }
         else{
             String emptyLabel = "--";
-            resultMap.put("timestamp",emptyLabel);
+            resultMap.put("timestamp",new Timestamp(System.currentTimeMillis()));
             resultMap.put("ip",ip);
-            resultMap.put("receiveBW",emptyLabel);
-            resultMap.put("transmitBW",emptyLabel);
-            resultMap.put("cpuUsage",emptyLabel);
-            resultMap.put("memoryUsage",emptyLabel);
-            resultMap.put("diskUsage",emptyLabel);
+            resultMap.put("receiveBW",0.0f);
+            resultMap.put("transmitBW",0.0f);
+            resultMap.put("cpuUsage",0.0f);
+            resultMap.put("memoryUsage",0.0f);
+            resultMap.put("diskUsage",0.0f);
         }
 
 

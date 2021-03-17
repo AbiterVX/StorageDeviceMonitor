@@ -99,7 +99,6 @@ public class MainController {
     public String postGetRecentHostInfoList(@RequestBody Map<String,Integer> map){
         int index=map.get("index");
         int minute=map.get("dateInterval");
-        //System.out.println("dateInterval:"+minute);
         String result = service_implementation.getFullRecordsByIP(service_implementation.getHostIp(index),minute);
         return result;
     }

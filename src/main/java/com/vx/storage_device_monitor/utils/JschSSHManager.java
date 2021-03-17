@@ -40,7 +40,7 @@ public class JschSSHManager implements SSHManager{
                 java.util.Properties config = new java.util.Properties();
                 config.put("StrictHostKeyChecking", "no");
                 currentSession.setConfig(config);
-                currentSession.connect();
+                currentSession.connect(1000);
                 sessionMap.put(hostConfigInfo.ip,currentSession);
             }
         } catch (Exception e) {

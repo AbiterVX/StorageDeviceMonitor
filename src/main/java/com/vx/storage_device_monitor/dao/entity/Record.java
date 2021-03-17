@@ -25,7 +25,19 @@ public class Record {
     private float tempf;
     private float energyf;
 
-
+    public Record(String ip, Timestamp timestamp, Integer iNumber, Integer oNumber, float receiveBWf, float transmitBWf, float cpuUsagef, float memoryUsagef, float diskUsagef, float tempf, float energyf) {
+        this.ip = ip;
+        this.timestamp = timestamp;
+        this.iNumber = iNumber;
+        this.oNumber = oNumber;
+        this.receiveBWf = receiveBWf;
+        this.transmitBWf = transmitBWf;
+        this.cpuUsagef = cpuUsagef;
+        this.memoryUsagef = memoryUsagef;
+        this.diskUsagef = diskUsagef;
+        this.tempf = tempf;
+        this.energyf = energyf;
+    }
     public Record(String ip, Timestamp timestamp, BigDecimal receiveBW, BigDecimal transmitBW, BigDecimal cpuUsage, BigDecimal memoryUsage, BigDecimal diskUsage,Integer iNumber, Integer oNumber,BigDecimal temp, BigDecimal energy) {
         this.ip = ip;
         this.timestamp = timestamp;
@@ -46,6 +58,8 @@ public class Record {
         this.tempf=temp.floatValue();
         this.energyf=energy.floatValue();
     }
+
+
 
     public String getIp() {
         return ip;
