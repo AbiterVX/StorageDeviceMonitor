@@ -1,3 +1,19 @@
+function FGetRefreshInterval(type){
+    if(type === "state"){
+        return 1000 * 5;
+    }
+    else if(type === "getRealTimeData"){
+        return 1000 * 5;
+    }
+    else if(type === "get"){
+        return 1000 * 5;
+    }
+    else {
+        return -1;
+    }
+}
+
+
 //界面跳转
 function FJump(index) {
     if(index===1){
@@ -19,8 +35,6 @@ function FJump(index) {
 function FInitHostIpList(){
     FGetHostState(FHostStateCallback);
 }
-
-
 
 
 //服务器状态回调
@@ -108,7 +122,6 @@ function FSelectHost(hostIpIndex,callbackFunc){
     callbackFunc(hostIpIndex);
 }
 
-
 function FInitDateIntervalDropDownMenu(dateIntervalLabel,selectBtnCallback){
     var dateIntervalDropDownMenu = document.getElementById("DateIntervalDropDownMenu");
     var dateIntervalDropDownMenuHtml = ""
@@ -128,7 +141,7 @@ function FSelectDateInterval(index,selectBtnCallback){
 
 function FCheckHostInfoJump(hostIpIndex){
     FSetCheckHostInfoJumpIndex(hostIpIndex);
-    window.location.href="CheckHostInfo";
+    window.location.href="HostInfo";
 }
 
 //获取 CheckHostInfo界面 跳转的index
@@ -250,3 +263,149 @@ function FAddDataUnitLabel(data,unitlabel){
 }
 
 
+//获取某一时段主机信息
+function FGetRecentHostInfoList(hostIndex,_dateInterval) {
+    var parameterData = '{"index": ' + hostIndex+  ',"dateInterval":' + _dateInterval +'}';
+    var jsonData = null;
+    $.ajax({
+        type:"post",
+        dataType:"json",
+        url:"/getRecentHostInfoList",
+        data:parameterData,
+        processData :false,
+        contentType:"application/json",
+        async:false,
+        success:function (resultJsonData) {
+            jsonData = resultJsonData;
+        },
+        error: function (err) {
+        }
+    });
+    return jsonData;
+}
+
+//磁盘故障信息
+function FGetDiskFailureList(hostIndex){
+    var parameterData = '{"index": ' + hostIndex+'}';
+    var jsonData = null;
+    $.ajax({
+        type:"post",
+        dataType:"json",
+        url:"/getDiskFailureList",
+        processData :false,
+        data:parameterData,
+        contentType:"application/json",
+        async:false,
+        success:function (resultJsonData) {
+            jsonData = resultJsonData;
+        },
+        error: function (err) {
+        }
+    });
+    return jsonData;
+}
+
+
+
+
+
+//初始化图表
+function FInitTable(currentChart,currentData,seriesName,unitLabel){
+    var option = {
+        grid: {
+            left: '2%',
+            right: '2%',
+            top: '10%',
+            bottom: '8%',
+            containLabel: true
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function(params){
+                var returnTxt = "时间: "+params[0].value[0] +"<br/>";
+                for(var i =0; i< params.length; i++){
+                    returnTxt += params[i].marker+" "+params[i].seriesName+ " "+params[i].value[1] + unitLabel + "<br/>";
+                }
+                return returnTxt;
+            }
+        },
+        xAxis: {
+            type: 'time',
+            splitLine: {
+                show: false
+            },
+            axisLabel: {
+                formatter: {
+                    year: '{yyyy}年',
+                    month: '{MM}月',
+                    day: '{MM}月{dd}日',
+                    hour: '{HH}:{mm}',
+                    minute: '{HH}:{mm}',
+                    second: '{HH}:{mm}:{ss}',
+                    millisecond: '{HH}:{mm}:{ss} ',
+                    none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            /*max: 100,
+            min: 0,
+            interval:20,*/
+            splitLine: {
+                show: true
+            },
+            axisLabel: {
+                formatter: '{value}'+ unitLabel
+            }
+        },
+        legend: {
+            data: seriesName
+        },
+        series: [{
+            name: '利用率',
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: currentData
+        },]
+    };
+    //单位为百分比，设置间距与范围
+    /*
+    if(unitLabel === "%" || unitLabel === "℃"){
+        option["yAxis"]["max"] = 100;
+        option["yAxis"]["min"] = 0;
+        option["yAxis"]["interval"] = 20;
+    }*/
+    //series
+
+    option["series"] = [];
+
+    for(var i=0;i<seriesName.length;i++){
+        option["series"].push({
+            name: seriesName[i],
+            type: 'line',
+            showSymbol: false,
+            hoverAnimation: false,
+            data: currentData[i],
+        })
+    }
+
+    if (option && typeof option === 'object') {
+        currentChart.setOption(option);
+    }
+}
+
+//刷新表格
+function FRefreshChart(currentChart,currentData,newDataName){
+    var option = {
+        series: []
+    };
+    for(var i=0;i<currentData.length;i++){
+        option["series"].push({
+            data:currentData[i]
+        })
+    }
+    currentChart.setOption(option);
+}

@@ -39,6 +39,14 @@ public class Config {
             String username = jsonObject.getString("username");
             String password = jsonObject.getString("password");
             HostConfigInfo newHostConfigInfo = new HostConfigInfo(ip,username,password);
+
+            //代理信息
+            if(jsonObject.containsKey("proxyIp") && jsonObject.containsKey("proxyPort")){
+                String proxyIp = jsonObject.getString("proxyIp");
+                int proxyPort = jsonObject.getInteger("proxyPort");
+                newHostConfigInfo.setProxy(proxyIp,proxyPort);
+            }
+
             //添加到List
             hostConfigInfoList.add(newHostConfigInfo);
         }

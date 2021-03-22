@@ -40,11 +40,21 @@ public class JschSSHManager implements SSHManager{
                 java.util.Properties config = new java.util.Properties();
                 config.put("StrictHostKeyChecking", "no");
                 currentSession.setConfig(config);
+
+
+
+                //设置代理
+                if(hostConfigInfo.proxy){
+                    ProxyHTTP proxyHTTP = new ProxyHTTP(hostConfigInfo.proxyIp,hostConfigInfo.proxyPort);
+                    currentSession.setProxy(proxyHTTP);
+                }
+
                 currentSession.connect(1000);
                 sessionMap.put(hostConfigInfo.ip,currentSession);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            //System.out.println("GetJSCHSession Error, IP:"+ hostConfigInfo.ip);
             handleException(currentSession,hostConfigInfo.ip);
             currentSession = null;
         }

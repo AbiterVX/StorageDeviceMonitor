@@ -25,24 +25,34 @@
 </script>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
-        数据中心资源监控
-    </a>
+    <!-- 顶部导航项 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a id="Title" class="navbar-brand col-sm-3 col-md-2 mr-0" href="/"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a id="Navbar1" class="nav-link" href="/"></a>
+                </li>
+                <!--
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Dropdown link
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                -->
+            </ul>
+        </div>
+    </nav>
 
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">仪表盘</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<div class="container-fluid">
+    <div class="container-fluid">
     <div class="row">
         <!-- 左侧导航项 -->
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -50,35 +60,41 @@
                 <ul class="nav flex-column">
                     <!-- 导航项 -->
                     <li class="nav-item">
-                        <a id="NavItem1" class="nav-link"  href="/">
+                        <a id="NavItem1" class="nav-link"  href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                            节点状态 <span class="sr-only">(current)</span>
+                            总览 <span class="sr-only">(current)</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a id="NavItem3" class="nav-link" href="CheckHostInfoComparison">
+                        <a id="NavItem2" class="nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                            资源利用对比
+                            主机信息
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a id="NavItem4" class="nav-link" href="CheckDiskFailureInfo">
+                        <a id="NavItem3" class="nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                            磁盘故障
+                            进程IO信息
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a id="NavItem5" class="nav-link" href="CheckIOInfo">
+                        <a id="NavItem4" class="nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                            IO
+                            磁盘故障预测
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="NavItem5" class="nav-link" href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                            IO测试
                         </a>
                     </li>
                 </ul>
 
                 <!-- 节点列表 -->
                 <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                    <span>计算与存储节点</span>
+                    <span>主机列表</span>
                 </h6>
                 <ul class="nav flex-column mb-2" id = "HostIpList" >
                     <!--<li class="nav-item">
@@ -104,9 +120,9 @@
             </div>
 
 
-            <!-- 磁盘故障信息-标题-->
+            <!-- 进程列表-标题-->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                <h2 class="h2">磁盘故障信息</h2>
+                <h2 class="h2">进程列表</h2>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         0.0.0.0
@@ -116,18 +132,19 @@
                     </div>
                 </div>
             </div>
-
-            <!-- 磁盘故障信息-表格 -->
+            <!-- 进程列表-表格 -->
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>
                     <tr>
-                        <th scope="col" style="min-width: 150px;" >时间</th>
-                        <th scope="col" style="min-width: 100px;">故障类别</th>
-                        <th scope="col">详情</th>
+                        <th scope="col">进程ID</th>
+                        <th scope="col">任务指令</th>
+                        <th scope="col">读数据</th>
+                        <th scope="col">写数据</th>
+                        <th scope="col">总延迟</th>
                     </tr>
                     </thead>
-                    <tbody id ="DiskFailureInfoList">
+                    <tbody id ="ProcessIOInfoList">
                     </tbody>
                 </table>
             </div>
@@ -160,75 +177,80 @@
 </div>
 </body>
 
-<script >
-    //更新间隔
-    var refreshInterval = 1000 * 5;
 
-    //磁盘故障信息
-    var diskFailureInfoList = document.getElementById("DiskFailureInfoList");
+<script >
+    //进程IO信息表格
+    var processIOInfoList = document.getElementById("ProcessIOInfoList");
     //下拉菜单-当前选择的host index
-    var currentHostIpIndex = 0;
+    var currentHostIpIndex = -1;
+    //进程IO信息
+    var processIOInfoData = [
+        {
+            pid:1,
+            command:"xxxx",
+            readSpeed:22,
+            writeSpeed:33,
+            ioDelay:123,
+        },
+        {
+            pid:1,
+            command:"xxxx",
+            readSpeed:22,
+            writeSpeed:33,
+            ioDelay:123,
+        },
+        {
+            pid:1,
+            command:"xxxx",
+            readSpeed:22,
+            writeSpeed:33,
+            ioDelay:123,
+        },
+    ];
 
     //页面加载完成后执行
     window.onload=function (){
         //设置左侧导航栏当前选中的导航项
-        setCurrentNavItem(5);
+        setCurrentNavItem(3);
         //初始化左侧导航栏HostIP列表
         FInitHostIpList();
         //定时任务:更新HostState
-        window.setInterval (FInitHostIpList,refreshInterval);
-
-        //分页
-        FRefreshPageNumList();
-
+        window.setInterval (FInitHostIpList,FGetRefreshInterval("state"));
 
         //初始化HostIp下拉菜单
         FInitHostIpDropDownMenu("FSelectBtnCallback",0);
-        //设备配置信息
-        setTimeout(FRefreshDiskFailureInfoList,10,0);
+        FSelectBtnCallback(0);
+        //分页
+        FRefreshPageNumList();
+
     }
 
-    //磁盘故障信息
-    function FGetDiskFailureList(hostIndex){
-        var parameterData = '{"index": ' + hostIndex+'}';
-        var jsonData = null;
-        $.ajax({
-            type:"post",
-            dataType:"json",
-            url:"/getDiskFailureList",
-            processData :false,
-            data:parameterData,
-            contentType:"application/json",
-            async:false,
-            success:function (resultJsonData) {
-                jsonData = resultJsonData;
-            },
-            error: function (err) {
-            }
-        });
-        return jsonData;
-    }
-
-    //磁盘故障信息刷新
-    function FRefreshDiskFailureInfoList(){
-        var jsonData = FGetDiskFailureList(currentHostIpIndex);
-        if(jsonData != null){
+    //进程IO信息刷新
+    function FRefreshProcessIOInfoList(){
+        if(processIOInfoData != null){
             var html = "";
-            for(var i=0;i<jsonData.length;i++){
-                html += '<tr><th scope="row">'+jsonData[i]["date"] +
-                    '</th><td>' +jsonData[i]["type"] +
-                    '</td><td>' +jsonData[i]["information"] +'</td></tr>';
+            for(var i=0;i<processIOInfoData.length;i++){
+                html +=
+                    '<tr><th scope="row">'+ processIOInfoData[i]["pid"] +
+                    '</th><td>' + processIOInfoData[i]["command"] +
+                    '</td><td>' + processIOInfoData[i]["readSpeed"] +
+                    '</td><td>' + processIOInfoData[i]["writeSpeed"] +
+                    '</td><td>' + processIOInfoData[i]["ioDelay"] +
+                    '</td></tr>';
             }
-            diskFailureInfoList.innerHTML = html;
+            processIOInfoList.innerHTML = html;
         }
     }
 
     //下拉菜单选项回调
     function FSelectBtnCallback(index){
-        currentHostIpIndex = index;
-        FRefreshDiskFailureInfoList();
+        if(index !== currentHostIpIndex){
+            currentHostIpIndex = index;
+            FRefreshProcessIOInfoList();
+        }
     }
 
+    //----------分页
     //当前页index
     var currentPageIndex = 1;
     //最小页index值

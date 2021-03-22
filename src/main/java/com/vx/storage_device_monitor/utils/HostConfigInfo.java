@@ -9,11 +9,25 @@ public class HostConfigInfo {
         ip = _ip;
         username = _username;
         password = _password;
+        proxy = false;
     }
+    public void setProxy(String _proxyIp,int _proxyPort){
+        proxyIp = _proxyIp;
+        proxyPort = _proxyPort;
+        proxy = true;
+    }
+
     //IP
     public String ip;
     //用户名
     public String username;
     //密码
     public String password;
+
+    //代理
+    public boolean proxy;
+
+    public String proxyIp;
+
+    public int proxyPort;
 }

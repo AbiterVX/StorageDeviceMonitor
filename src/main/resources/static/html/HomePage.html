@@ -20,24 +20,19 @@
     <script type="text/javascript" src="../js/WidgetDisplay.js"></script>
 </head>
 
-<script>
 
-</script>
 
 <body>
     <!-- 顶部导航项 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
-            数据中心资源监控
-        </a>
-
+        <a id="Title" class="navbar-brand col-sm-3 col-md-2 mr-0" href="/"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a id="Navbar1" class="nav-link" href="#">仪表盘</a>
+                    <a id="Navbar1" class="nav-link" href="/"></a>
                 </li>
                 <!--
                 <li class="nav-item dropdown">
@@ -55,7 +50,7 @@
         </div>
     </nav>
 
-
+    <!-- 主要内容 -->
     <div class="container-fluid">
         <div class="row">
             <!-- 左侧导航项 -->
@@ -64,35 +59,41 @@
                     <ul class="nav flex-column">
                         <!-- 导航项 -->
                         <li class="nav-item">
-                            <a id="NavItem1" class="nav-link"  href="/">
+                            <a id="NavItem1" class="nav-link"  href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                                节点状态 <span class="sr-only">(current)</span>
+                                总览 <span class="sr-only">(current)</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a id="NavItem3" class="nav-link" href="CheckHostInfoComparison">
+                            <a id="NavItem2" class="nav-link" href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                资源利用对比
+                                主机信息
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a id="NavItem4" class="nav-link" href="CheckDiskFailureInfo">
+                            <a id="NavItem3" class="nav-link" href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                                磁盘故障
+                                进程IO信息
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a id="NavItem5" class="nav-link" href="CheckIOInfo">
+                            <a id="NavItem4" class="nav-link" href="#">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                                IO
+                                磁盘故障预测
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="NavItem5" class="nav-link" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                                IO测试
                             </a>
                         </li>
                     </ul>
 
                     <!-- 节点列表 -->
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>计算与存储节点</span>
+                        <span>主机列表</span>
                     </h6>
                     <ul class="nav flex-column mb-2" id = "HostIpList" >
                         <!--<li class="nav-item">
@@ -128,9 +129,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">IP</th>
-                                <th scope="col">CPU利用率</th>
-                                <th scope="col">内存利用率</th>
-                                <th scope="col">磁盘利用率</th>
+                                <th scope="col">CPU</th>
+                                <th scope="col">内存</th>
+                                <th scope="col">存储容量</th>
+                                <th scope="col">iops</th>
+                                <th scope="col">并发数</th>
                                 <th scope="col">网络接受数据</th>
                                 <th scope="col">网络发送数据</th>
                                 <th scope="col">温度</th>
@@ -152,46 +155,18 @@
                         </canvas>
                     </div>
                 </div>
-
-
-                <!-- 设备配置-标题-->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                    <h2 class="h2">设备配置</h2>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="HostIpDropDownBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            0.0.0.0
-                        </button>
-                        <div id="HostIpDropDownMenu" class="dropdown-menu" aria-labelledby="HostIpDropDownBtn">
-                            <a class="dropdown-item" href="#" onclick="FSelectHost(0)"> 0.0.0.0</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- 设备配置-表格 -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                        <thead>
-                        <tr>
-                            <th scope="col">名称</th>
-                            <th scope="col">配置</th>
-                            <th scope="col">其他</th>
-                        </tr>
-                        </thead>
-                        <tbody id ="HostHardWareInfoListTable">
-                        </tbody>
-                    </table>
-                </div>
             </main>
         </div>
     </div>
 </body>
 
+
 <script >
     //更新间隔
-    var refreshInterval = 1000 * 5;
+    var refreshInterval = FGetRefreshInterval("state");
     //主机信息表
     var hostInfoListTable = document.getElementById("HostInfoListTable");
-    //host设备配置表
-    var hostHardWareInfoListTable = document.getElementById("HostHardWareInfoListTable");
+
     //下拉菜单-当前选择的host index
     var currentHostIpIndex = 0;
 
@@ -204,63 +179,58 @@
     window.onload=function (){
         //设置左侧导航栏当前选中的导航项
         setCurrentNavItem(1);
+
         //初始化左侧导航栏HostIP列表
         FInitHostIpList();
         //定时任务:更新HostState
-        window.setInterval (FInitHostIpList,refreshInterval);
-        //初始化HostIp下拉菜单
-        FInitHostIpDropDownMenu("FSelectBtnCallback",0);
+        window.setInterval (FInitHostIpList,FGetRefreshInterval("state"));
 
-        //刷新Host硬件信息
-        FGetHostHardWareInfo(FRefreshHostHardWareInfoCallback);
-        //定时刷新数据
-        FGetHostRealTimeInfo(FRefreshHostRealTimeInfoCallback);
-        window.setInterval (FGetHostRealTimeInfo,refreshInterval,FRefreshHostRealTimeInfoCallback);
+
+
+        //FInitOverviewData();
 
         //初始化表格
         overviewChart = echarts.init(document.getElementById("OverviewChart"));
         FInitOverviewTable(overviewChart,overviewData,["CPU利用率","内存利用率","网络接受数据","网络发送数据"],["%","%","Kb/s","Kb/s"]);
+
+        //定时刷新数据
+        FGetHostRealTimeInfo(FRefreshHostRealTimeInfoCallback);
+        window.setInterval (FGetHostRealTimeInfo,refreshInterval,FRefreshHostRealTimeInfoCallback);
     }
 
-    //刷新Host硬件信息
-    function FRefreshHostHardWareInfoCallback(jsonData){
-        if(jsonData != null){
-            var html = "";
-            html += '<tr><th scope="row">OS</th><td>'+ jsonData[currentHostIpIndex]["OS"]+'</td><td>--</td></tr>';
-            html += '<tr><th scope="row">CPU</th><td>'+ jsonData[currentHostIpIndex]["CPU"]+'</td><td>--</td></tr>';
-            html += '<tr><th scope="row">Memory</th><td>'+ jsonData[currentHostIpIndex]["Memory"]+'</td><td>' + jsonData[currentHostIpIndex]["MemorySize"]  +'</td></tr>';
-            html += '<tr><th scope="row">Disk</th><td>'+ jsonData[currentHostIpIndex]["Disk"]+'</td><td>--</td></tr>';
-            hostHardWareInfoListTable.innerHTML = html;
+    function FInitOverviewData(){
+        //todo
+        var timeInterval = 60;
+        var hostIpList = FGetHostIpList();
+        for(var i=0;i<hostIpList.length;i++){
+            var jsonData = FGetRecentHostInfoList(i,timeInterval);
+
         }
+    }
+
+    //添加总览数据
+    function FAddOverviewData(jsonData){
+        var overviewTempData = [0,0,0,0];
+        //!(overviewData[0].length != 0 && overviewData[1][overviewData[1].length -1 ][0] == date)
+        for(var i=0;i< jsonData.length;i++){
+            overviewTempData[0] += jsonData[i]["cpuUsage"];
+            overviewTempData[1] += jsonData[i]["memoryUsage"];
+            overviewTempData[2] += jsonData[i]["receiveBW"];
+            overviewTempData[3] += jsonData[i]["transmitBW"];
+        }
+        var date = FGetDateTime(jsonData[1]["timestamp"]);
+        for(var i=0;i< overviewTempData.length;i++){
+            overviewData[i].push([ date,(overviewTempData[i]/jsonData.length).toFixed(2)]  );
+            //overviewData[i].shift();
+        }
+        FRefreshOverviewData();
     }
 
     //[定时]刷新Host实时信息
     function FRefreshHostRealTimeInfoCallback(jsonData){
         if(jsonData != null){
             var HostIpListHtml = ""
-
-            if(true){
-                var overviewTempData = [0,0,0,0];
-                //!(overviewData[0].length != 0 && overviewData[1][overviewData[1].length -1 ][0] == date)
-                for(var i=0;i< jsonData.length;i++){
-                    overviewTempData[0] += jsonData[i]["cpuUsage"];
-                    overviewTempData[1] += jsonData[i]["memoryUsage"];
-                    overviewTempData[2] += jsonData[i]["receiveBW"];
-                    overviewTempData[3] += jsonData[i]["transmitBW"];
-                }
-                for(var i=0;i< jsonData.length;i++){
-                    overviewTempData[i] = (overviewTempData[i]/jsonData.length).toFixed(2);
-                }
-
-
-                var date = FGetDateTime(jsonData[1]["timestamp"]);
-                overviewData[0].push([date,overviewTempData[0]]);
-                overviewData[1].push([date,overviewTempData[1]]);
-                overviewData[2].push([date,overviewTempData[2]]);
-                overviewData[3].push([date,overviewTempData[3]]);
-            }
-
-
+            FAddOverviewData(jsonData);
             for(var i=0;i< jsonData.length;i++){
                 var cpuUsage = FAddDataUnitLabel(jsonData[i]["cpuUsage"],"%");
                 var memoryUsage = FAddDataUnitLabel(jsonData[i]["memoryUsage"],"%");
@@ -268,33 +238,28 @@
                 var receiveBW = FAddDataUnitLabel(jsonData[i]["receiveBW"]," Kb/s");
                 var transmitBW = FAddDataUnitLabel(jsonData[i]["transmitBW"]," Kb/s");
 
-                var date = FGetDateTime(jsonData[i]["timestamp"]);
-
-
-
-
-                FRefreshOverviewData();
-
                 HostIpListHtml +=   '<tr>' +
                     '  <th scope="row">'+jsonData[i]["ip"]  +'</th>' +
                     '  <td>'+
                     '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
                     '      <div style="width: '+ jsonData[i]["cpuUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + cpuUsage+'</h6>' +
+                    '      <h6 style="margin-top:2px;width: 100px;"> ' + cpuUsage+'</h6>' +
                     '  </div></td>' +
 
                     '  <td>'+
-                    '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
+                    '      <div class="progress" style="width: 130px;height: 25px;text-align: center;">\n' +
                     '      <div style="width: '+ jsonData[i]["memoryUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' + memoryUsage+'</h6>' +
+                    '      <h6 style="margin-top:2px;width: 130px;"> ' + memoryUsage+'</h6>' +
                     '  </div></td>' +
 
                     '  <td>'+
-                    '      <div class="progress" style="width: 100px;height: 25px;text-align: center;">\n' +
-                    '      <div style="width: '+ jsonData[i]["diskUsage"] +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
-                    '      <h6 style="margin-top:2px;position:absolute;width: 100px;"> ' +diskUsage +'</h6>' +
+                    '      <div class="progress" style="width: 130px;height: 25px;text-align: center;">\n' +
+                    '      <div style="width: '+ 0 +'%" class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" ></div>\n' +
+                    '      <h6 style="margin-top:2px;width: 130px;"> ' + '0/0 GB' +'</h6>' +
                     '  </div></td>' +
 
+                    '  <td>'+ "--"  +'</td>' +
+                    '  <td>'+ "--"  +'</td>' +
                     '  <td>'+receiveBW   +'</td>' +
                     '  <td>'+transmitBW   +'</td>' +
                     '  <td>'+ "--"  +'</td>' +
@@ -304,12 +269,6 @@
         }
         //设置主机IP列表
         FSetHostIpList("HostIpList");
-    }
-
-    //下拉菜单选项回调
-    function FSelectBtnCallback(index){
-        currentHostIpIndex = index;
-        FGetHostHardWareInfo(FRefreshHostHardWareInfoCallback);
     }
 
     //初始化图表
@@ -377,146 +336,14 @@
                     return returnTxt;
                 }
             },
-            xAxis: [
-                {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    },
-                    axisLabel: {
-                        formatter: {
-                            year: '{yyyy}年',
-                            month: '{MM}月',
-                            day: '{MM}月{dd}日',
-                            hour: '{HH}:{mm}',
-                            minute: '{HH}:{mm}',
-                            second: '{HH}:{mm}:{ss}',
-                            millisecond: '{HH}:{mm}:{ss} ',
-                            none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
-                        }
-                    },
-                    gridIndex: 0,
-                },
-                {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    },
-                    axisLabel: {
-                        formatter: {
-                            year: '{yyyy}年',
-                            month: '{MM}月',
-                            day: '{MM}月{dd}日',
-                            hour: '{HH}:{mm}',
-                            minute: '{HH}:{mm}',
-                            second: '{HH}:{mm}:{ss}',
-                            millisecond: '{HH}:{mm}:{ss} ',
-                            none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
-                        }
-                    },
-                    gridIndex: 1,
-                },
-                {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    },
-                    axisLabel: {
-                        formatter: {
-                            year: '{yyyy}年',
-                            month: '{MM}月',
-                            day: '{MM}月{dd}日',
-                            hour: '{HH}:{mm}',
-                            minute: '{HH}:{mm}',
-                            second: '{HH}:{mm}:{ss}',
-                            millisecond: '{HH}:{mm}:{ss} ',
-                            none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
-                        }
-                    },
-                    gridIndex: 2,
-                },
-                {
-                    type: 'time',
-                    splitLine: {
-                        show: false
-                    },
-                    axisLabel: {
-                        formatter: {
-                            year: '{yyyy}年',
-                            month: '{MM}月',
-                            day: '{MM}月{dd}日',
-                            hour: '{HH}:{mm}',
-                            minute: '{HH}:{mm}',
-                            second: '{HH}:{mm}:{ss}',
-                            millisecond: '{HH}:{mm}:{ss} ',
-                            none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
-                        }
-                    },
-                    gridIndex: 3,
-                },
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    /*max: 100,
-                    min: 0,
-                    interval:20,*/
-                    splitLine: {
-                        show: true
-                    },
-                    axisLabel: {
-                        formatter: '{value}'+ unitLabel[0]
-                    },
-                    gridIndex: 0,
-                },
-                {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    /*max: 100,
-                    min: 0,
-                    interval:20,*/
-                    splitLine: {
-                        show: true
-                    },
-                    axisLabel: {
-                        formatter: '{value}'+ unitLabel[1]
-                    },
-                    gridIndex: 1,
-                },
-                {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    /*max: 100,
-                    min: 0,
-                    interval:20,*/
-                    splitLine: {
-                        show: true
-                    },
-                    axisLabel: {
-                        formatter: '{value}'+ unitLabel[2]
-                    },
-                    gridIndex: 2,
-                },
-                {
-                    type: 'value',
-                    boundaryGap: [0, '100%'],
-                    /*max: 100,
-                    min: 0,
-                    interval:20,*/
-                    splitLine: {
-                        show: true
-                    },
-                    axisLabel: {
-                        formatter: '{value}'+ unitLabel[3]
-                    },
-                    gridIndex: 3,
-                },
-            ],
-            series: []
+            xAxis: [],
+            yAxis: [],
+            series: [],
         };
 
         option["series"] = [];
+        option["xAxis"] = [];
+        option["yAxis"] = [];
         for(var i=0;i<seriesName.length;i++){
             option["series"].push({
                 name: seriesName[i],
@@ -524,8 +351,39 @@
                 showSymbol: false,
                 hoverAnimation: false,
                 data: currentData[i],
-            })
+            });
+            option["xAxis"].push({
+                type: 'time',
+                splitLine: {
+                    show: false
+                },
+                axisLabel: {
+                    formatter: {
+                        year: '{yyyy}年',
+                        month: '{MM}月',
+                        day: '{MM}月{dd}日',
+                        hour: '{HH}:{mm}',
+                        minute: '{HH}:{mm}',
+                        second: '{HH}:{mm}:{ss}',
+                        millisecond: '{HH}:{mm}:{ss} ',
+                        none: '{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}'
+                    }
+                },
+                gridIndex: i,
+            });
+            option["yAxis"].push({
+                type: 'value',
+                boundaryGap: [0, '100%'],
+                splitLine: {
+                    show: true
+                },
+                axisLabel: {
+                    formatter: '{value}'+ unitLabel[i]
+                },
+                gridIndex: i,
+            });
         }
+
 
         if (option && typeof option === 'object') {
             currentChart.setOption(option);

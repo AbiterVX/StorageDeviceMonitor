@@ -35,25 +35,35 @@ public class MainController {
         return "html/HomePage.html";
     }
 
-
     //index界面/主界面
     @RequestMapping(value ="/HomePage", method = RequestMethod.GET)
     public String getHomePage(){
         return "html/HomePage.html";
     }
 
-    //资源利用界面
-    @RequestMapping(value ="/CheckHostInfo", method = RequestMethod.GET)
-    public String getCheckHostInfoPage(){
-        return "html/CheckHostInfo.html";
+    //[界面]主机信息
+    @RequestMapping(value ="/HostInfo", method = RequestMethod.GET)
+    public String getHostInfoPage(){
+        return "html/HostInfo.html";
     }
 
-    //磁盘故障界面
-    @RequestMapping(value ="/CheckDiskFailureInfo", method = RequestMethod.GET)
-    public String getCheckDiskFailureInfoPage(){
-        return "html/CheckDiskFailureInfo.html";
+    //[界面]进程IO信息
+    @RequestMapping(value ="/ProcessIOInfo", method = RequestMethod.GET)
+    public String getProcessIOInfoPage(){
+        return "html/ProcessIOInfo.html";
     }
 
+    //[界面]磁盘故障预测
+    @RequestMapping(value ="/DiskFailurePredict", method = RequestMethod.GET)
+    public String getDiskFailurePredictPage(){
+        return "html/DiskFailurePredict.html";
+    }
+
+    //[界面]IO测试
+    @RequestMapping(value ="/IOTest", method = RequestMethod.GET)
+    public String getIOTestPage(){
+        return "html/IOTest.html";
+    }
 
 
     //测试界面
@@ -62,11 +72,15 @@ public class MainController {
         return "html/Test.html";
     }
 
-    //资源利用率对比界面
+    //[废弃]资源利用率对比界面
     @RequestMapping(value ="/CheckHostInfoComparison", method = RequestMethod.GET)
     public String getCheckHostInfoComparison(){
         return "html/CheckHostInfoComparison.html";
     }
+
+
+
+
 
     //主机数据获取
     @ResponseBody
